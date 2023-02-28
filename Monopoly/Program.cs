@@ -32,7 +32,7 @@ namespace Monopoly
 
         public static void Main(string[] args)
         {
-            string path = @"D:\Dissertation\Monopoly\board.csv";
+            string path = @"D:\DissRepository\DissRepository\Monopoly\board.csv";
             var parser = new StreamReader(path);
             var headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -42,7 +42,7 @@ namespace Monopoly
                 board.Add(new Property(row[0], Convert.ToInt32(row[1]), row[2], row[3], Convert.ToInt32(row[4]), Convert.ToInt32(row[5]), Convert.ToInt32(row[6]), Convert.ToInt32(row[7]), Convert.ToInt32(row[8]), Convert.ToInt32(row[9]), Convert.ToInt32(row[10]), Convert.ToInt32(row[11])));
             }
 
-            path = @"D:\Dissertation\Monopoly\chance.csv";
+            path = @"D:\DissRepository\DissRepository\Monopoly\chance.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -52,7 +52,7 @@ namespace Monopoly
                 chance.Add(new Card("chance", row[0], Convert.ToInt32(row[1]), row[2]));
             }
 
-            path = @"D:\Dissertation\Monopoly\chest.csv";
+            path = @"D:\DissRepository\DissRepository\Monopoly\chest.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
