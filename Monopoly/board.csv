@@ -1,0 +1,41 @@
+Name,Position,Type,Colour,Price,Build,Rent,Rent1,Rent2,Rent3,Rent4,Rent5
+Go,0,Go,NA,0,0,0,0,0,0,0,0
+Old Kent Road,1,Property,Brown,60,50,2,10,30,90,160,250
+Community Chest,2,Chest,NA,0,0,0,0,0,0,0,0
+Whitechapel Road,3,Property,Brown,60,50,4,20,60,180,320,450
+Income Tax,4,Tax,NA,200,0,0,0,0,0,0,0
+Kings Cross Station,5,Station,NA,200,0,0,0,0,0,0,0
+The Angel Islington,6,Property,Blue,100,50,6,30,90,270,400,550
+Chance,7,Chance,NA,0,0,0,0,0,0,0,0
+Euston Road,8,Property,Blue,100,50,6,30,90,270,400,550
+Pentonville Road,9,Property,Blue,120,50,8,40,100,300,450,600
+Jail,10,Jail,NA,0,0,0,0,0,0,0,0
+Pall Mall,11,Property,Pink,140,100,10,50,150,450,625,750
+Electric Company,12,Utility,NA,150,0,0,0,0,0,0,0
+Whitehall,13,Property,Pink,140,100,10,50,150,450,625,750
+Northumberland Avenue,14,Property,Pink,160,100,12,60,180,500,700,900
+Marylebone Station,15,Station,NA,200,0,0,0,0,0,0,0
+Bow Street,16,Property,Orange,180,100,14,70,200,550,750,950
+Community Chest,17,Chest,NA,0,0,0,0,0,0,0,0
+Marlborough Street,18,Property,Orange,180,100,14,70,200,550,750,950
+Vine Street,19,Property,Orange,200,100,16,80,220,600,800,1000
+Free Parking,20,Parking,NA,0,0,0,0,0,0,0,0
+Stand,21,Property,Red,220,150,18,90,250,700,875,1050
+Chance,22,Chance,NA,0,0,0,0,0,0,0,0
+Fleet Street,23,Property,Red,220,150,18,90,250,700,875,1050
+Trafalgar Square,24,Property,Red,240,150,20,100,300,750,925,1100
+Fenchurch Street Station,25,Station,NA,200,0,0,0,0,0,0,0
+Leicester Square,26,Property,Yellow,260,150,22,110,330,800,975,1150
+Coventry Street,27,Property,Yellow,260,150,22,110,330,800,975,1150
+Water Works,28,Utility,NA,150,0,0,0,0,0,0,0
+Piccadilly,29,Property,Yellow,280,150,24,120,360,850,1025,1200
+Go To Jail,30,GoToJail,NA,0,0,0,0,0,0,0,0
+Regent Street,31,Property,Green,300,200,26,130,390,850,1100,1275
+Oxford Street,32,Property,Green,300,200,26,130,390,900,1100,1275
+Community Chest,33,Chest,NA,0,0,0,0,0,0,0,0
+Bond Street,34,Property,Green,320,200,28,150,450,1000,1200,1400
+Liverpool Street Station,35,Station,NA,200,0,0,0,0,0,0,0
+Chance,36,Chance,NA,0,0,0,0,0,0,0,0
+Park Lane,37,Property,Purple,350,200,35,175,500,1100,1300,1500
+Super Tax,38,Tax,NA,75,0,0,0,0,0,0,0
+Mayfair,39,Property,Purple,400,200,50,200,600,1400,1700,2000
