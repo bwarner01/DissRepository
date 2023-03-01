@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj": {}
+    "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj": {}
   },
   "projects": {
-    "D:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj": {
+    "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
+        "projectUniqueName": "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
         "projectName": "Monopoly",
-        "projectPath": "D:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
-        "packagesPath": "C:\\Users\\bwarn\\.nuget\\packages\\",
-        "outputPath": "D:\\DissRepository\\DissRepository\\Monopoly\\obj\\",
+        "projectPath": "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
+        "packagesPath": "C:\\Users\\mayan\\.nuget\\packages\\",
+        "outputPath": "E:\\DissRepository\\DissRepository\\Monopoly\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\bwarn\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mayan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -55,7 +55,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }

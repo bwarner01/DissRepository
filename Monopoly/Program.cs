@@ -32,7 +32,7 @@ namespace Monopoly
 
         public static void Main(string[] args)
         {
-            string path = @"D:\DissRepository\DissRepository\Monopoly\board.csv";
+            string path = @"E:\DissRepository\DissRepository\Monopoly\board.csv";
             var parser = new StreamReader(path);
             var headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -42,7 +42,7 @@ namespace Monopoly
                 board.Add(new Property(row[0], Convert.ToInt32(row[1]), row[2], row[3], Convert.ToInt32(row[4]), Convert.ToInt32(row[5]), Convert.ToInt32(row[6]), Convert.ToInt32(row[7]), Convert.ToInt32(row[8]), Convert.ToInt32(row[9]), Convert.ToInt32(row[10]), Convert.ToInt32(row[11])));
             }
 
-            path = @"D:\DissRepository\DissRepository\Monopoly\chance.csv";
+            path = @"E:\DissRepository\DissRepository\Monopoly\chance.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -52,7 +52,7 @@ namespace Monopoly
                 chance.Add(new Card("chance", row[0], Convert.ToInt32(row[1]), row[2]));
             }
 
-            path = @"D:\DissRepository\DissRepository\Monopoly\chest.csv";
+            path = @"E:\DissRepository\DissRepository\Monopoly\chest.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -274,10 +274,17 @@ namespace Monopoly
             }
 
             if (board[p.GetPosition()].GetOwned() && !board[p.GetPosition()].GetMortgaged() && board[p.GetPosition()].GetOwner() != p && hasRolled == true && paid == false)
-            {
-                options.Clear();
+            {               
                 Console.WriteLine("This property is owned by {0}!", board[p.GetPosition()].GetOwner().GetName());
-                options.Add("Pay Rent");
+                if (!jailRent && board[p.GetPosition()].GetOwner().IsJailed())
+                {
+                    Console.WriteLine("They are in jail so you do not have to pay rent");
+                }
+                else
+                {
+                    options.Clear();
+                    options.Add("Pay Rent");
+                }              
             }
 
             if(board[p.GetPosition()].GetPropertyType() == "Tax" && hasRolled == true && paid == false)
@@ -586,8 +593,16 @@ namespace Monopoly
                 paid = true;
                 int rent = board[p.GetPosition()].GetRent(diceRoll);
                 Player owner = board[p.GetPosition()].GetOwner();
-                p.PayRent(owner, rent);
-                Console.WriteLine("You payed {0} to {1}", rent, owner.GetName());
+                if(owner.GetMonopolies().Exists(x => x == board[p.GetPosition()]) && board[p.GetPosition()].GetHouses() == 0  && doubleRentMonopoly)
+                {
+                    p.PayRent(owner, rent * 2);
+                    Console.WriteLine("You payed {0} to {1}", rent * 2, owner.GetName());
+                }
+                else
+                {
+                    p.PayRent(owner, rent);
+                    Console.WriteLine("You payed {0} to {1}", rent, owner.GetName());
+                }               
             }
             if(action== "Pay Tax")
             {

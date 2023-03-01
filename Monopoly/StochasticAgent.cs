@@ -15,9 +15,9 @@ namespace Monopoly
             int selection = 0;
             if (options.Exists(x => x == "Mortgage/Sell Property") || options.Exists(x => x == "End Turn") || options.Exists(x => x == "Roll The Dice") || options.Exists(x => x == "Sell Houses") || options.Exists(x => x == "Roll Dice To Get Out Of Jail") || options.Count == 2)
             {
-                selection = picker.Next(0, options.Count -1);
+                selection = picker.Next(0, options.Count -2);
             }
-            selection = picker.Next(0, options.Count);
+            selection = picker.Next(0, options.Count-1);
             return selection;
         }
     }
