@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
@@ -194,12 +195,15 @@ namespace Monopoly
 
         private static List<string> GenOptions(Player p, bool turnEnded, bool hasRolled, bool canRoll, bool paid)
         {
-            List<string> options = new List<string>();
-            
-            options.Add("View Your Property");
-            options.Add("View Position information");
-            options.Add("View Player Data");
-            
+            List<string> options = new List<string>
+            {
+                "View Your Property",
+                "View Position information",
+                "View Player Data",
+                "Make Trade"
+            };
+
+
 
             if (!p.IsJailed())
             {
@@ -658,6 +662,110 @@ namespace Monopoly
                     hasRolled = true;
                     paid = false;
                 }
+            }
+            if(action== "Make Trade")
+            {
+                List<Property> tradeIn = new List<Property>();
+                List<Property> tradeOut = new List<Property>();
+                int moneyIn = 0;
+                int moneyOut = 0;
+                paid = true;
+                Console.WriteLine("Who do you want to trade with?\n");
+                List<Player> otherPlayers = new List<Player>();
+                foreach(Player other in players)
+                {
+                    if(other != p)
+                    {
+                        otherPlayers.Add(other);
+                    }                   
+                }
+                for(int i = 0; i < otherPlayers.Count; i++)
+                {
+                    Console.WriteLine("{0}: {1}", i, otherPlayers[i].GetName());
+                }
+                int number = InputInt("Enter the number corresponding to the player you want to trade with", 0, otherPlayers.Count - 1);
+                Player partner = otherPlayers[number];
+                
+                bool complete = false;
+
+                while (!complete)
+                {
+                    Console.WriteLine("These are {0}'s properties", partner.GetName());
+                    for (int i = 0; i < partner.GetTradeable().Count; i++)
+                    {
+                        Console.WriteLine("{0}: {1}", i, partner.GetTradeable()[i].GetName());
+                    }
+                    Console.WriteLine("{0}: None");
+                    number = InputInt("Enter the corresponding number of the property you want", 0, partner.GetTradeable().Count);
+                    if(number == partner.GetTradeable().Count)
+                    {
+                        Console.WriteLine("None of their properties have been added.");
+                        complete = true;
+                    }
+                    else
+                    {
+                        tradeIn.Add(partner.GetTradeable()[number]);
+                        Console.WriteLine("{0} has been added to the deal", partner.GetTradeable()[number].GetName());
+                        string check = InputString("Would you like to add any more of their properties to the deal? y/n", 1, 1);
+                        if(check.ToLower() == "y")
+                        {
+                            complete = true;
+                        }
+                    }
+                }
+                complete = false;
+                while (!complete)
+                {
+                    Console.WriteLine("These are your properties");
+                    for (int i = 0; i < p.GetTradeable().Count; i++)
+                    {
+                        Console.WriteLine("{0}: {1}", i, p.GetTradeable()[i].GetName());
+                    }
+                    Console.WriteLine("{0}: None");
+                    number = InputInt("Enter the corresponding number of the property you want to trade", 0, p.GetTradeable().Count);
+                    if (number == partner.GetTradeable().Count)
+                    {
+                        Console.WriteLine("None of their properties have been added.");
+                        complete = true;
+                    }
+                    else
+                    {
+                        tradeIn.Add(partner.GetTradeable()[number]);
+                        Console.WriteLine("{0} has been added to the deal", p.GetTradeable()[number].GetName());
+                        string check = InputString("Would you like to add any more of your properties to the deal? y/n", 1, 1);
+                        if (check.ToLower() == "y")
+                        {
+                            complete = true;
+                        }
+                    }
+                }
+                moneyIn = InputInt("How much money would you like to recieve for the deal?", 0, partner.GetMoney());
+                moneyOut = InputInt("How much money would you like to give for the deal?", 0, p.GetMoney());
+
+                Console.WriteLine("{0}, do you agree to this deal?");
+                int agree = InputInt("0 for agree, 1 for disagree", 0, 1);
+
+                if(agree == 0)
+                {
+                    foreach(Property prop in tradeIn)
+                    {
+                        partner.SendProperty(prop, p);
+                    }
+                    foreach (Property prop in tradeOut)
+                    {
+                        p.SendProperty(prop, partner);
+                    }
+                    p.Pay(moneyOut);
+                    p.GetPaid(moneyIn);
+                    partner.Pay(moneyIn);
+                    partner.GetPaid(moneyOut);
+                    Console.WriteLine("Trade Completed");
+                }
+                else
+                {
+                    Console.WriteLine("Trade Cancelled");
+                }
+
             }
         }
 

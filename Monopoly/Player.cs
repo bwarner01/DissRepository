@@ -170,6 +170,17 @@ namespace Monopoly
             doubleCount = 0;
         }
 
+        public void AddProperty(Property property)
+        {
+            properties.Add(property);
+        }
+
+        public void SendProperty(Property property, Player p) 
+        {
+            p.AddProperty(property);
+            properties.Remove(property);
+        }
+
         public void BuyProperty(Property property)
         {
             money -= property.GetPrice();
