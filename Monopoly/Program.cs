@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -449,8 +450,22 @@ namespace Monopoly
                     Console.WriteLine("{0}: {1}", i, properties[i].GetName());
                 }
                 Console.WriteLine("{0}: Cancel", properties.Count);
-                int number = InputInt("\nEnter the number corresponding to the desired property.", 0, properties.Count);
-                if(number < properties.Count)
+                int number = properties.Count;
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, properties.Count);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(properties.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                }
+                if (number < properties.Count)
                 {
                     if (!mortgage)
                     {
@@ -484,8 +499,22 @@ namespace Monopoly
                     Console.WriteLine("{0}: {1}", i, mortgages[i].GetName());
                 }
                 Console.WriteLine("{0}: Cancel", mortgages.Count);
-                int number = InputInt("\nEnter the number corresponding to the desired property.", 0, mortgages.Count);
-                if(number < mortgages.Count)
+                int number = mortgages.Count;
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, mortgages.Count);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(mortgages.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                }
+                if (number < mortgages.Count)
                 {
                     if(p.GetMoney() > (mortgages[number].GetPrice()/2)+(mortgages[number].GetPrice() / 20))
                     {
@@ -519,8 +548,22 @@ namespace Monopoly
                     Console.WriteLine("{0}: {1}", i, buildable[i].GetName());
                 }
                 Console.WriteLine("{0}: Cancel", buildable.Count);
-                int number = InputInt("\nEnter the number corresponding to the desired property.", 0, buildable.Count);
-                if(number < buildable.Count)
+                int number = buildable.Count;
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, buildable.Count);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(buildable.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                }
+                if (number < buildable.Count)
                 {
                     if(p.GetMoney() > buildable[number].GetBuildPrice())
                     {
@@ -559,8 +602,22 @@ namespace Monopoly
                     Console.WriteLine("{0}: {1}", i, sellable[i].GetName());
                 }
                 Console.WriteLine("{0}: Cancel", sellable.Count);
-                int number = InputInt("\nEnter the number corresponding to the desired property.", 0, sellable.Count);
-                if(number < sellable.Count)
+                int number = sellable.Count;
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, sellable.Count);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(sellable.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                }
+                if (number < sellable.Count)
                 {
                     sellable[number].SellHouse(p);
                 }
@@ -701,7 +758,21 @@ namespace Monopoly
                 {
                     Console.WriteLine("{0}: {1}", i, otherPlayers[i].GetName());
                 }
-                int number = InputInt("Enter the number corresponding to the player you want to trade with", 0, otherPlayers.Count - 1);
+                int number = otherPlayers.Count - 1;
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, otherPlayers.Count - 1);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(otherPlayers.Count - 1);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                }
                 Player partner = otherPlayers[number];
                 
                 bool complete = false;
@@ -714,8 +785,22 @@ namespace Monopoly
                         Console.WriteLine("{0}: {1}", i, partner.GetTradeable()[i].GetName());
                     }
                     Console.WriteLine("{0}: None", partner.GetTradeable().Count);
-                    number = InputInt("Enter the corresponding number of the property you want", 0, partner.GetTradeable().Count);
-                    if(number == partner.GetTradeable().Count)
+                    number = partner.GetTradeable().Count;
+                    switch (p.GetAgent())
+                    {
+                        case Player.Agents.Human:
+                            {
+                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, partner.GetTradeable().Count);
+                                break;
+                            }
+                        case Player.Agents.Stochastic:
+                            {
+                                number = stochAg.SelectItem(partner.GetTradeable().Count);
+                                Console.WriteLine(number);
+                                break;
+                            }
+                    }
+                    if (number == partner.GetTradeable().Count)
                     {
                         Console.WriteLine("None of their properties have been added.");
                         complete = true;
@@ -740,7 +825,21 @@ namespace Monopoly
                         Console.WriteLine("{0}: {1}", i, p.GetTradeable()[i].GetName());
                     }
                     Console.WriteLine("{0}: None", p.GetTradeable().Count);
-                    number = InputInt("Enter the corresponding number of the property you want to trade", 0, p.GetTradeable().Count);
+                    number = p.GetTradeable().Count;
+                    switch (p.GetAgent())
+                    {
+                        case Player.Agents.Human:
+                            {
+                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, p.GetTradeable().Count);
+                                break;
+                            }
+                        case Player.Agents.Stochastic:
+                            {
+                                number = stochAg.SelectItem(p.GetTradeable().Count);
+                                Console.WriteLine(number);
+                                break;
+                            }
+                    }
                     if (number == p.GetTradeable().Count)
                     {
                         Console.WriteLine("None of your properties have been added.");
@@ -757,13 +856,53 @@ namespace Monopoly
                         }
                     }
                 }
-                moneyIn = InputInt("How much money would you like to recieve for the deal?", 0, partner.GetMoney());
-                moneyOut = InputInt("How much money would you like to give for the deal?", 0, p.GetMoney());
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            moneyIn = InputInt("How much money would you like to recieve for the deal?", 0, partner.GetMoney());
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            moneyIn = stochAg.SelectItem(partner.GetMoney());
+                            Console.WriteLine(moneyIn);
+                            break;
+                        }
+                }
+                switch (p.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            moneyOut = InputInt("How much money would you like to give for the deal?", 0, p.GetMoney());
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            moneyIn = stochAg.SelectItem(p.GetMoney());
+                            Console.WriteLine(moneyOut);
+                            break;
+                        }
+                }
 
                 Console.WriteLine("{0}, do you agree to this deal?", partner.GetName());
-                int agree = InputInt("0 for agree, 1 for disagree", 0, 1);
+                int agree = 1;
+                switch (partner.GetAgent())
+                {
+                    case Player.Agents.Human:
+                        {
+                            agree = InputInt("0 for agree, 1 for disagree", 0, 1);
+                            break;
+                        }
+                    case Player.Agents.Stochastic:
+                        {
+                            agree = stochAg.SelectItem(1);
+                            Console.WriteLine(agree);
+                            break;
+                        }
+                }
 
-                if(agree == 0)
+                if (agree == 0)
                 {
                     foreach(Property prop in tradeIn)
                     {
