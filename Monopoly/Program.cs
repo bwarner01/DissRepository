@@ -16,6 +16,7 @@ namespace Monopoly
         static List<Card> chance = new List<Card>();
         static List<Card> chest = new List<Card>();
         static Random dice = new Random();
+        static StochasticAgent stochAg = new StochasticAgent();
 
 
         static int startMoney = 1500;
@@ -69,7 +70,8 @@ namespace Monopoly
             for (int i = 0; i < numPlayers; i++)
             {
                 string name = InputString(string.Format("\nPlease enter player {0}'s name.", i + 1), 1, 25);
-                players.Add(new Player(name, startMoney, goMoney, goBonus));
+                int agentSelection = InputInt(string.Format("\nInsert player type:\n0: Human \n1: Stochastic Agent \n2: Hard Coded Agent \n3: RL Agent"), 0, 3);
+                players.Add(new Player(name, startMoney, goMoney, goBonus, agentSelection));
             }
 
             while (players.Count > 1)
@@ -85,6 +87,7 @@ namespace Monopoly
                     bool paid = false;
                     bool bankrupt = false;
                     p.DoubleReset();
+                    int choice = 0;
                     while (!turnEnded)
                     {
 
@@ -109,7 +112,22 @@ namespace Monopoly
                         {
                             Console.WriteLine("{0}: {1}", i, option[i]);
                         }
-                        int choice = InputInt("\n Enter the number of your choice: ", 0, option.Count - 1);
+                        
+                        switch (p.GetAgent())
+                        {
+                            case Player.Agents.Human:
+                            {
+                                choice = InputInt("\n Enter the number of your choice: ", 0, option.Count - 1);
+                                break;
+                            }
+                            case Player.Agents.Stochastic:
+                            {
+                                choice = stochAg.SelectOption(option);
+                                Console.WriteLine(choice);
+                                break;
+                            }
+                        }
+                        
                         PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);
                     }
                     if(players.Count - eliminated.Count <= 1)
@@ -695,7 +713,7 @@ namespace Monopoly
                     {
                         Console.WriteLine("{0}: {1}", i, partner.GetTradeable()[i].GetName());
                     }
-                    Console.WriteLine("{0}: None");
+                    Console.WriteLine("{0}: None", partner.GetTradeable().Count);
                     number = InputInt("Enter the corresponding number of the property you want", 0, partner.GetTradeable().Count);
                     if(number == partner.GetTradeable().Count)
                     {
@@ -707,7 +725,7 @@ namespace Monopoly
                         tradeIn.Add(partner.GetTradeable()[number]);
                         Console.WriteLine("{0} has been added to the deal", partner.GetTradeable()[number].GetName());
                         string check = InputString("Would you like to add any more of their properties to the deal? y/n", 1, 1);
-                        if(check.ToLower() == "y")
+                        if(check.ToLower() != "y")
                         {
                             complete = true;
                         }
@@ -721,19 +739,19 @@ namespace Monopoly
                     {
                         Console.WriteLine("{0}: {1}", i, p.GetTradeable()[i].GetName());
                     }
-                    Console.WriteLine("{0}: None");
+                    Console.WriteLine("{0}: None", p.GetTradeable().Count);
                     number = InputInt("Enter the corresponding number of the property you want to trade", 0, p.GetTradeable().Count);
-                    if (number == partner.GetTradeable().Count)
+                    if (number == p.GetTradeable().Count)
                     {
-                        Console.WriteLine("None of their properties have been added.");
+                        Console.WriteLine("None of your properties have been added.");
                         complete = true;
                     }
                     else
                     {
-                        tradeIn.Add(partner.GetTradeable()[number]);
+                        tradeOut.Add(p.GetTradeable()[number]);
                         Console.WriteLine("{0} has been added to the deal", p.GetTradeable()[number].GetName());
                         string check = InputString("Would you like to add any more of your properties to the deal? y/n", 1, 1);
-                        if (check.ToLower() == "y")
+                        if (check.ToLower() != "y")
                         {
                             complete = true;
                         }
@@ -742,7 +760,7 @@ namespace Monopoly
                 moneyIn = InputInt("How much money would you like to recieve for the deal?", 0, partner.GetMoney());
                 moneyOut = InputInt("How much money would you like to give for the deal?", 0, p.GetMoney());
 
-                Console.WriteLine("{0}, do you agree to this deal?");
+                Console.WriteLine("{0}, do you agree to this deal?", partner.GetName());
                 int agree = InputInt("0 for agree, 1 for disagree", 0, 1);
 
                 if(agree == 0)

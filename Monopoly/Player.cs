@@ -21,8 +21,10 @@ namespace Monopoly
         private int doubleCount;
         private bool hasPardon;
         private Card? pardonCard;
+        public enum Agents {Human, Stochastic, Statistic, RL}
+        private Agents agent;
 
-        public Player(string name, int money, int goMoney, int goBonus)
+        public Player(string name, int money, int goMoney, int goBonus, int agentSelection)
         {
             this.name = name;
             this.money = money;
@@ -37,6 +39,36 @@ namespace Monopoly
             doubleCount = 0;
             hasPardon = false;
             pardonCard = null;
+            SetAgent(agentSelection);
+        }
+
+        public void SetAgent(int agentSelection)
+        {
+            if (agentSelection == 0)
+            {
+                agent = Agents.Human;
+            }
+            else if (agentSelection == 1)
+            {
+                agent = Agents.Stochastic;
+            }
+            else if (agentSelection == 2)
+            {
+                agent = Agents.Statistic;
+            }
+            else if (agentSelection == 3)
+            {
+                agent = Agents.RL;
+            }
+            else
+            {
+                agent = Agents.Human;
+            }
+        }
+
+        public Agents GetAgent()
+        {
+            return agent;
         }
 
         public string GetName()

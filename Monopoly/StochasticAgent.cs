@@ -20,5 +20,10 @@ namespace Monopoly
             selection = picker.Next(0, options.Count-1);
             return selection;
         }
+
+        public int SelectItem(int range)
+        {
+            return picker.Next(0, range);
+        }
     }
 }
