@@ -8,7 +8,7 @@ namespace Monopoly
 {
     public class StochasticAgent
     {
-        Random picker = new Random();
+        private Random picker = new Random();
 
         public int SelectOption(List<string> options)
         {
