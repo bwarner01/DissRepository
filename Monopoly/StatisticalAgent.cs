@@ -27,6 +27,8 @@ namespace Monopoly
         public int SelectOption(List<string> options, Player p, Property currentSpace)
         {
             bool buildPossible = false;
+            bool unmortgagePossible = false;
+            
             foreach(Property prop in p.GetMonopolies())
             {
                 if (prop.GetBuildPrice() + stockpileValue < p.GetMoney())
@@ -35,17 +37,41 @@ namespace Monopoly
                 }
             }
 
+            foreach(Property prop in p.GetProperties())
+            {
+                if (prop.GetMortgaged() && p.GetMoney() > (prop.GetPrice() / 2) + (prop.GetPrice() / 2 / 10) + stockpileValue)
+                {
+                    unmortgagePossible = true;
+                }
+            }
+
             if(options.Count == 2)
             {
                 return 0;
             }
-            if(options.Exists(x => x == "Buy Property") && p.GetMoney() > currentSpace.GetPrice() + stockpileValue)
+            else if (options.Exists(x => x == "Use Get Out Jail Free Card"))
+            {
+                return options.FindIndex(0, x => x == "Use Get Out Jail Free Card");
+            }
+            else if (options.Exists(x => x == "Pay To Get Out Of Jail") && p.GetMoney() > 50)
+            {
+                return options.FindIndex(0, x => x == "Pay To Get Out Of Jail");
+            }
+            else if(options.Exists(x => x == "Roll Dice To Get Out Of Jail"))
+            {
+                return options.FindIndex(0, x => x == "Roll Dice To Get Out Of Jail");
+            }
+            else if(options.Exists(x => x == "Buy Property") && p.GetMoney() > currentSpace.GetPrice() + stockpileValue)
             {
                 return options.FindIndex(0, x => x == "Buy Property");
             }
             else if (options.Exists(x => x == "Roll The Dice"))
             {
                 return options.FindIndex(0, x => x == "Roll The Dice");
+            }
+            else if (options.Exists(x => x == "Unmortgage Property")  && unmortgagePossible)
+            {
+                return options.FindIndex(0, x => x == "Unmortgage Property");
             }
             else if (buildPossible && options.Exists(x => x == "Build Houses"))
             {
@@ -104,6 +130,18 @@ namespace Monopoly
                 }
             }
             return picker.Next(0, sellable.Count);
+        }
+
+        public int SelectUnmortgage(List<Property> mortgages, Player p)
+        {
+            foreach(Property prop in mortgages)
+            {
+                if (p.GetMoney() > (prop.GetPrice() / 2) + (prop.GetPrice() / 2 / 10) + stockpileValue)
+                {
+                    return mortgages.FindIndex(0, x => x == prop);
+                }
+            }
+            return mortgages.Count;
         }
 
         public int AssessTrade(List<Property> tradeIn, List<Property> tradeOut, int moneyIn, int moneyOut)

@@ -529,7 +529,7 @@ namespace Monopoly
                     //Complete the statistic agent decision process here
                     case Player.Agents.Statistic:
                         {
-                            number = stochAg.SelectItem(mortgages.Count);
+                            number = statAg.SelectUnmortgage(mortgages, p);
                             Console.WriteLine(number);
                             break;
                         }
@@ -945,10 +945,64 @@ namespace Monopoly
                     foreach(Property prop in tradeIn)
                     {
                         partner.SendProperty(prop, p);
+                        string colour = prop.GetColour();
+                        int count = 0;
+                        int ownedCount = 0;
+                        foreach (Property property in board)
+                        {
+                            if (property.GetColour() == colour && property.GetColour() != "NA")
+                            {
+                                count++;
+                            }
+                        }
+                        foreach (Property property in p.GetProperties())
+                        {
+                            if (prop.GetColour() == colour)
+                            {
+                                ownedCount++;
+                            }
+                        }
+                        if (count == ownedCount)
+                        {
+                            foreach (Property property in p.GetProperties())
+                            {
+                                if (prop.GetColour() == colour)
+                                {
+                                    p.AddMonopolies(property);
+                                }
+                            }
+                        }
                     }
                     foreach (Property prop in tradeOut)
                     {
                         p.SendProperty(prop, partner);
+                        string colour = prop.GetColour();
+                        int count = 0;
+                        int ownedCount = 0;
+                        foreach (Property property in board)
+                        {
+                            if (property.GetColour() == colour && property.GetColour() != "NA")
+                            {
+                                count++;
+                            }
+                        }
+                        foreach (Property property in p.GetProperties())
+                        {
+                            if (prop.GetColour() == colour)
+                            {
+                                ownedCount++;
+                            }
+                        }
+                        if (count == ownedCount)
+                        {
+                            foreach (Property property in p.GetProperties())
+                            {
+                                if (prop.GetColour() == colour)
+                                {
+                                    partner.AddMonopolies(property);
+                                }
+                            }
+                        }
                     }
                     p.Pay(moneyOut);
                     p.GetPaid(moneyIn);
