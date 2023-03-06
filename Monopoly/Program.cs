@@ -18,6 +18,7 @@ namespace Monopoly
         static List<Card> chest = new List<Card>();
         static Random dice = new Random();
         static StochasticAgent stochAg = new StochasticAgent();
+        static StatisticalAgent statAg = new StatisticalAgent();
 
 
         static int startMoney = 1500;
@@ -124,6 +125,12 @@ namespace Monopoly
                             case Player.Agents.Stochastic:
                             {
                                 choice = stochAg.SelectOption(option);
+                                Console.WriteLine(choice);
+                                break;
+                            }
+                            case Player.Agents.Statistic:
+                            {
+                                choice = statAg.SelectOption(option, p, board[p.GetPosition()]);
                                 Console.WriteLine(choice);
                                 break;
                             }
@@ -464,6 +471,12 @@ namespace Monopoly
                             Console.WriteLine(number);
                             break;
                         }
+                    case Player.Agents.Statistic:
+                        {
+                            number = statAg.SelectSellProperty(properties, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
                 }
                 if (number < properties.Count)
                 {
@@ -508,6 +521,13 @@ namespace Monopoly
                             break;
                         }
                     case Player.Agents.Stochastic:
+                        {
+                            number = stochAg.SelectItem(mortgages.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                    //Complete the statistic agent decision process here
+                    case Player.Agents.Statistic:
                         {
                             number = stochAg.SelectItem(mortgages.Count);
                             Console.WriteLine(number);
@@ -562,6 +582,12 @@ namespace Monopoly
                             Console.WriteLine(number);
                             break;
                         }
+                    case Player.Agents.Statistic:
+                        {
+                            number = statAg.SelectBuildable(buildable, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
                 }
                 if (number < buildable.Count)
                 {
@@ -613,6 +639,12 @@ namespace Monopoly
                     case Player.Agents.Stochastic:
                         {
                             number = stochAg.SelectItem(sellable.Count);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                    case Player.Agents.Statistic:
+                        {
+                            number = statAg.SelectSellHouse(sellable, p);
                             Console.WriteLine(number);
                             break;
                         }
@@ -898,6 +930,12 @@ namespace Monopoly
                         {
                             agree = stochAg.SelectItem(1);
                             Console.WriteLine(agree);
+                            break;
+                        }
+                    case Player.Agents.Statistic:
+                        {
+                            number = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
+                            Console.WriteLine(number);
                             break;
                         }
                 }
