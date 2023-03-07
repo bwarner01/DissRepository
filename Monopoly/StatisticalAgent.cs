@@ -31,7 +31,7 @@ namespace Monopoly
             
             foreach(Property prop in p.GetMonopolies())
             {
-                if (prop.GetBuildPrice() + stockpileValue < p.GetMoney())
+                if (prop.GetBuildPrice() + stockpileValue < p.GetMoney() && prop.IsBuildable(p.GetMonopolies()))
                 {
                     buildPossible = true;
                 }

@@ -40,6 +40,11 @@ namespace Monopoly
             houses = 0;
         }
 
+        public void SetOwner(Player owner)
+        {
+            this.owner = owner;
+        }
+        
         public int GetPrice()
         {
             return price;
@@ -192,14 +197,19 @@ namespace Monopoly
         public bool IsBuildable(List<Property> properties)
         {
             int minHouses = houses;
+            bool maxed = true;
             foreach(Property p in properties)
             {
                 if(p.GetColour().Equals(colour) && p.GetHouses() < minHouses)
                 {
                     minHouses = p.GetHouses();
                 }
+                if(p.GetHouses() < 5)
+                {
+                    maxed = false;
+                }
             }
-            if (minHouses < houses)
+            if (minHouses < houses || maxed)
             {
                 return false;
             }

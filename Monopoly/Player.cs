@@ -136,6 +136,19 @@ namespace Monopoly
             return doubleCount;
         }
 
+        public bool CanBuild()
+        {
+            bool canBuild = false;
+            foreach (Property p in monopolies)
+            {
+                if (p.IsBuildable(monopolies))
+                {
+                    canBuild = true;
+                }
+            }
+            return canBuild;
+        }
+
         public void Pay(int amount)
         {
             money -= amount;
@@ -149,6 +162,53 @@ namespace Monopoly
         public void AddMonopolies(Property prop)
         {
             monopolies.Add(prop);
+        }
+
+        public void CheckForMonopolies(String colour, List<Property> board)
+        {
+            int count = 0;
+            int ownedCount = 0;
+            foreach (Property prop in board)
+            {
+                if (prop.GetColour() == colour && prop.GetColour() != "NA")
+                {
+                    count++;
+                }
+            }
+            foreach (Property prop in properties)
+            {
+                if (prop.GetColour() == colour)
+                {
+                    ownedCount++;
+                }
+            }
+            if (count == ownedCount)
+            {
+                foreach (Property prop in properties)
+                {
+                    if (prop.GetColour() == colour)
+                    {
+                        AddMonopolies(prop);
+                    }
+                }
+            }
+        }
+
+        public void RemoveMonopolies(Property p)
+        {
+            List<Property> toRemove = new List<Property>();
+            string colour = p.GetColour();
+            foreach(Property prop in monopolies)
+            {
+                if (prop.GetColour().Equals(colour))
+                {
+                    toRemove.Add(prop);
+                }
+            }
+            foreach(Property prop in toRemove)
+            {
+                monopolies.Remove(prop);
+            }
         }
 
         public void PayRent(Player owner, int rent)

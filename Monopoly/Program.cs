@@ -260,7 +260,7 @@ namespace Monopoly
                     }
                 }
 
-                if (p.GetMonopolies().Count > 0)
+                if (p.CanBuild())
                 {
                     options.Add("Build Houses");
                     bool hasHouses = false;
@@ -421,32 +421,7 @@ namespace Monopoly
                 p.BuyProperty(board[p.GetPosition()]);
                 board[p.GetPosition()].Bought(p);
                 string colour = board[p.GetPosition()].GetColour();
-                int count = 0;
-                int ownedCount = 0;
-                foreach(Property prop in board)
-                {
-                    if (prop.GetColour() == colour && prop.GetColour() != "NA")
-                    {
-                        count++;
-                    }
-                }
-                foreach(Property prop in p.GetProperties())
-                {
-                    if (prop.GetColour() == colour)
-                    {
-                        ownedCount++;
-                    }
-                }
-                if(count == ownedCount)
-                {
-                    foreach(Property prop in p.GetProperties())
-                    {
-                        if(prop.GetColour() == colour)
-                        {
-                            p.AddMonopolies(prop);
-                        }
-                    }
-                }
+                p.CheckForMonopolies(colour, board);
             }
             if(action== "Mortgage/Sell Property")
             {
@@ -483,6 +458,7 @@ namespace Monopoly
                     if (!mortgage)
                     {
                         p.SellProperty(properties[number]);
+                        p.RemoveMonopolies(properties[number]);
                         Console.WriteLine("You have sold {0} and recieved {1}", properties[number].GetName(), properties[number].GetPrice()/2);
                     }
                     else
@@ -526,7 +502,6 @@ namespace Monopoly
                             Console.WriteLine(number);
                             break;
                         }
-                    //Complete the statistic agent decision process here
                     case Player.Agents.Statistic:
                         {
                             number = statAg.SelectUnmortgage(mortgages, p);
@@ -772,6 +747,7 @@ namespace Monopoly
             }
             if(action== "Make Trade")
             {
+                List<Property> ownedProperty = p.GetTradeable();
                 List<Property> tradeIn = new List<Property>();
                 List<Property> tradeOut = new List<Property>();
                 int moneyIn = 0;
@@ -795,7 +771,7 @@ namespace Monopoly
                 {
                     case Player.Agents.Human:
                         {
-                            number = InputInt("\nEnter the number corresponding to the desired property.", 0, otherPlayers.Count - 1);
+                            number = InputInt("\nEnter the number corresponding to the desired player.", 0, otherPlayers.Count - 1);
                             break;
                         }
                     case Player.Agents.Stochastic:
@@ -806,42 +782,59 @@ namespace Monopoly
                         }
                 }
                 Player partner = otherPlayers[number];
+                List<Property> wantedProperty = partner.GetTradeable();
                 
                 bool complete = false;
 
                 while (!complete)
                 {
                     Console.WriteLine("These are {0}'s properties", partner.GetName());
-                    for (int i = 0; i < partner.GetTradeable().Count; i++)
+                    for (int i = 0; i < wantedProperty.Count; i++)
                     {
-                        Console.WriteLine("{0}: {1}", i, partner.GetTradeable()[i].GetName());
+                        Console.WriteLine("{0}: {1}", i, wantedProperty[i].GetName());
                     }
-                    Console.WriteLine("{0}: None", partner.GetTradeable().Count);
-                    number = partner.GetTradeable().Count;
+                    Console.WriteLine("{0}: None", wantedProperty.Count);
+                    number = wantedProperty.Count;
                     switch (p.GetAgent())
                     {
                         case Player.Agents.Human:
                             {
-                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, partner.GetTradeable().Count);
+                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, wantedProperty.Count);
                                 break;
                             }
                         case Player.Agents.Stochastic:
                             {
-                                number = stochAg.SelectItem(partner.GetTradeable().Count);
+                                number = stochAg.SelectItem(wantedProperty.Count);
                                 Console.WriteLine(number);
                                 break;
                             }
                     }
-                    if (number == partner.GetTradeable().Count)
+                    if (number == wantedProperty.Count)
                     {
                         Console.WriteLine("None of their properties have been added.");
                         complete = true;
                     }
                     else
                     {
-                        tradeIn.Add(partner.GetTradeable()[number]);
-                        Console.WriteLine("{0} has been added to the deal", partner.GetTradeable()[number].GetName());
-                        string check = InputString("Would you like to add any more of their properties to the deal? y/n", 1, 1);
+                        tradeIn.Add(wantedProperty[number]);
+                        Console.WriteLine("{0} has been added to the deal", wantedProperty[number].GetName());
+                        wantedProperty.Remove(wantedProperty[number]);
+                        string check = "n";
+                        switch (p.GetAgent())
+                        {
+                            case Player.Agents.Human:
+                                {
+                                    check = InputString("Would you like to add any more of your properties to the deal? y/n", 1, 1);
+                                    break;
+                                }
+                            case Player.Agents.Stochastic:
+                                {
+                                    Console.WriteLine("Would you like to add any more of your properties to the deal? y/n");
+                                    check = stochAg.YorN();
+                                    Console.WriteLine(check);
+                                    break;
+                                }
+                        }
                         if(check.ToLower() != "y")
                         {
                             complete = true;
@@ -852,36 +845,54 @@ namespace Monopoly
                 while (!complete)
                 {
                     Console.WriteLine("These are your properties");
-                    for (int i = 0; i < p.GetTradeable().Count; i++)
+                    for (int i = 0; i < ownedProperty.Count; i++)
                     {
-                        Console.WriteLine("{0}: {1}", i, p.GetTradeable()[i].GetName());
+                        Console.WriteLine("{0}: {1}", i, ownedProperty[i].GetName());
                     }
-                    Console.WriteLine("{0}: None", p.GetTradeable().Count);
-                    number = p.GetTradeable().Count;
+                    Console.WriteLine("{0}: None", ownedProperty.Count);
+                    number = ownedProperty.Count;
                     switch (p.GetAgent())
                     {
                         case Player.Agents.Human:
                             {
-                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, p.GetTradeable().Count);
+                                number = InputInt("\nEnter the number corresponding to the desired property.", 0, ownedProperty.Count);
                                 break;
                             }
                         case Player.Agents.Stochastic:
                             {
-                                number = stochAg.SelectItem(p.GetTradeable().Count);
+                                number = stochAg.SelectItem(ownedProperty.Count);
                                 Console.WriteLine(number);
                                 break;
                             }
                     }
-                    if (number == p.GetTradeable().Count)
+                    if (number == ownedProperty.Count)
                     {
                         Console.WriteLine("None of your properties have been added.");
                         complete = true;
                     }
                     else
                     {
-                        tradeOut.Add(p.GetTradeable()[number]);
-                        Console.WriteLine("{0} has been added to the deal", p.GetTradeable()[number].GetName());
-                        string check = InputString("Would you like to add any more of your properties to the deal? y/n", 1, 1);
+                        tradeOut.Add(ownedProperty[number]);
+
+                        Console.WriteLine("{0} has been added to the deal", ownedProperty[number].GetName());
+                        ownedProperty.Remove(ownedProperty[number]);
+                        string check = "n";
+                        switch (p.GetAgent())
+                        {
+                            case Player.Agents.Human:
+                                {
+                                    check = InputString("Would you like to add any more of your properties to the deal? y/n", 1, 1);
+                                    break;
+                                }
+                            case Player.Agents.Stochastic:
+                                {
+                                    Console.WriteLine("Would you like to add any more of your properties to the deal? y/n");
+                                    check = stochAg.YorN();
+                                    Console.WriteLine(check);
+                                    break;
+                                }
+                        }
+                        
                         if (check.ToLower() != "y")
                         {
                             complete = true;
@@ -911,7 +922,7 @@ namespace Monopoly
                         }
                     case Player.Agents.Stochastic:
                         {
-                            moneyIn = stochAg.SelectItem(p.GetMoney());
+                            moneyOut = stochAg.SelectItem(p.GetMoney());
                             Console.WriteLine(moneyOut);
                             break;
                         }
@@ -945,64 +956,18 @@ namespace Monopoly
                     foreach(Property prop in tradeIn)
                     {
                         partner.SendProperty(prop, p);
+                        prop.SetOwner(p);
                         string colour = prop.GetColour();
-                        int count = 0;
-                        int ownedCount = 0;
-                        foreach (Property property in board)
-                        {
-                            if (property.GetColour() == colour && property.GetColour() != "NA")
-                            {
-                                count++;
-                            }
-                        }
-                        foreach (Property property in p.GetProperties())
-                        {
-                            if (prop.GetColour() == colour)
-                            {
-                                ownedCount++;
-                            }
-                        }
-                        if (count == ownedCount)
-                        {
-                            foreach (Property property in p.GetProperties())
-                            {
-                                if (prop.GetColour() == colour)
-                                {
-                                    p.AddMonopolies(property);
-                                }
-                            }
-                        }
+                        p.CheckForMonopolies(colour, board);
+                        partner.RemoveMonopolies(prop);
                     }
                     foreach (Property prop in tradeOut)
                     {
                         p.SendProperty(prop, partner);
+                        prop.SetOwner(partner);
                         string colour = prop.GetColour();
-                        int count = 0;
-                        int ownedCount = 0;
-                        foreach (Property property in board)
-                        {
-                            if (property.GetColour() == colour && property.GetColour() != "NA")
-                            {
-                                count++;
-                            }
-                        }
-                        foreach (Property property in p.GetProperties())
-                        {
-                            if (prop.GetColour() == colour)
-                            {
-                                ownedCount++;
-                            }
-                        }
-                        if (count == ownedCount)
-                        {
-                            foreach (Property property in p.GetProperties())
-                            {
-                                if (prop.GetColour() == colour)
-                                {
-                                    partner.AddMonopolies(property);
-                                }
-                            }
-                        }
+                        partner.CheckForMonopolies(colour, board);
+                        p.RemoveMonopolies(prop);
                     }
                     p.Pay(moneyOut);
                     p.GetPaid(moneyIn);
