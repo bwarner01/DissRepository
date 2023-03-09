@@ -243,39 +243,6 @@ namespace Monopoly
                     options.Add("Buy Property");
                 }
 
-                if (p.GetProperties().Count > 0)
-                {
-                    options.Add("Mortgage/Sell Property");
-                    bool hasMortgage = false;
-                    foreach (Property prop in p.GetProperties())
-                    {
-                        if (prop.GetMortgaged() == true)
-                        {
-                            hasMortgage = true;
-                        }
-                    }
-                    if (hasMortgage)
-                    {
-                        options.Add("Unmortgage Property");
-                    }
-                }
-
-                if (p.CanBuild())
-                {
-                    options.Add("Build Houses");
-                    bool hasHouses = false;
-                    foreach (Property prop in p.GetProperties())
-                    {
-                        if (prop.GetHouses() > 0)
-                        {
-                            hasHouses = true;
-                        }
-                    }
-                    if (hasHouses)
-                    {
-                        options.Add("Sell Houses");
-                    }
-                }
             }
             else if (p.GetTurnsInJail() < 4 && p.GetTurnsInJail() > 0)
             {
@@ -301,6 +268,40 @@ namespace Monopoly
             if (!canRoll && p.GetMoney() >= 0)
             {
                 options.Add("End Turn");
+            }
+
+            if (p.GetProperties().Count > 0)
+            {
+                options.Add("Mortgage/Sell Property");
+                bool hasMortgage = false;
+                foreach (Property prop in p.GetProperties())
+                {
+                    if (prop.GetMortgaged() == true)
+                    {
+                        hasMortgage = true;
+                    }
+                }
+                if (hasMortgage)
+                {
+                    options.Add("Unmortgage Property");
+                }
+            }
+
+            if (p.CanBuild())
+            {
+                options.Add("Build Houses");
+                bool hasHouses = false;
+                foreach (Property prop in p.GetProperties())
+                {
+                    if (prop.GetHouses() > 0)
+                    {
+                        hasHouses = true;
+                    }
+                }
+                if (hasHouses)
+                {
+                    options.Add("Sell Houses");
+                }
             }
 
             if (board[p.GetPosition()].GetOwned() && !board[p.GetPosition()].GetMortgaged() && board[p.GetPosition()].GetOwner() != p && hasRolled == true && paid == false)
