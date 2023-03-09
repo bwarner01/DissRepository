@@ -28,10 +28,19 @@ namespace Monopoly
         {
             bool buildPossible = false;
             bool unmortgagePossible = false;
+            List<Property> buildable = new List<Property>();
             
-            foreach(Property prop in p.GetMonopolies())
+            foreach (Property prop in p.GetMonopolies())
             {
-                if (prop.GetBuildPrice() + stockpileValue < p.GetMoney() && prop.IsBuildable(p.GetMonopolies()))
+                if (prop.GetHouses() < 5 && prop.IsBuildable(p.GetMonopolies()))
+                {
+                    buildable.Add(prop);
+                }
+            }
+
+            foreach (Property prop in buildable)
+            {
+                if (prop.GetBuildPrice() < p.GetMoney() - stockpileValue)
                 {
                     buildPossible = true;
                 }
@@ -77,12 +86,13 @@ namespace Monopoly
             {
                 return options.FindIndex(0, x => x == "Build Houses");
             }
-            else if (p.GetMoney() < 0 && options.Exists(x => x == "Sell Houses"))
+            else if (p.GetMoney() < 0 && options.Exists(x => x == "Sell Houses") || (p.IsJailed() && p.GetMoney() < 50 && options.Exists(x => x == "Sell Houses")))
             {
                 return options.FindIndex(0, x => x == "Sell Houses");
             }
-            else if (p.GetMoney() < 0 && options.Exists(x => x == "Mortgage/Sell Property"))
+            else if (p.GetMoney() < 0 && options.Exists(x => x == "Mortgage/Sell Property") || (p.IsJailed() && p.GetMoney() < 50 && options.Exists(x => x == "Mortgage/Sell Property")) )
             {
+                Console.WriteLine(options.FindIndex(0, x => x == "Mortgage/Sell Property"));
                 return options.FindIndex(0, x => x == "Mortgage/Sell Property");
             }
             else if (options.Exists(x => x == "End Turn"))

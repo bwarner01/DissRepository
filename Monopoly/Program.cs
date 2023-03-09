@@ -39,6 +39,8 @@ namespace Monopoly
             string path = @"E:\DissRepository\DissRepository\Monopoly\board.csv";
             var parser = new StreamReader(path);
             var headerLine = parser.ReadLine();
+            int goes = 0;
+            bool draw = false;
             while (!parser.EndOfStream)
             {
                 var line = parser.ReadLine();
@@ -76,7 +78,7 @@ namespace Monopoly
                 players.Add(new Player(name, startMoney, goMoney, goBonus, agentSelection));
             }
 
-            while (players.Count > 1)
+            while (players.Count > 1 && !draw)
             {
                 List<Player> eliminated = new List<Player>();
                 foreach(Player p in players)
@@ -137,8 +139,14 @@ namespace Monopoly
                         }
                         
                         PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);
+                        goes += 1;
+                        if (goes > 2000)
+                        {                           
+                            draw = true;
+                            break;
+                        }
                     }
-                    if(players.Count - eliminated.Count <= 1)
+                    if(players.Count - eliminated.Count <= 1 || draw)
                     {
                         break;
                     }
@@ -148,7 +156,14 @@ namespace Monopoly
                     players.Remove(p);
                 }
             }
-            Console.WriteLine("{0} wins", players[0].GetName());
+            if (draw)
+            {
+                Console.WriteLine("The game has ended in a slatemate");
+            }
+            else
+            {
+                Console.WriteLine("{0} wins", players[0].GetName());
+            }
         }
 
         public static void Shuffle(List<Card> list)
