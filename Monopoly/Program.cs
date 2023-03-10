@@ -7,10 +7,11 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Monopoly
 {
-    class Program
+    public class Program
     {
         static List<Player> players = new List<Player>();
         static List<Property> board = new List<Property>();
@@ -34,8 +35,12 @@ namespace Monopoly
         static bool freeParkingMoney = false;
         static bool evenBuild = false;
 
-        public static void Main(string[] args)
+        public string Game(string player1, int agent1, string player2, int agent2)
         {
+            players.Clear();
+            board.Clear();
+            chance.Clear();
+            chest.Clear();
             string path = @"E:\DissRepository\DissRepository\Monopoly\board.csv";
             var parser = new StreamReader(path);
             var headerLine = parser.ReadLine();
@@ -71,12 +76,14 @@ namespace Monopoly
             Shuffle(chance);
             Shuffle(chest);
 
-            for (int i = 0; i < numPlayers; i++)
-            {
-                string name = InputString(string.Format("\nPlease enter player {0}'s name.", i + 1), 1, 25);
-                int agentSelection = InputInt(string.Format("\nInsert player type:\n0: Human \n1: Stochastic Agent \n2: Hard Coded Agent \n3: RL Agent"), 0, 3);
-                players.Add(new Player(name, startMoney, goMoney, goBonus, agentSelection));
-            }
+            //for (int i = 0; i < numPlayers; i++)
+            //{
+            //    string name = InputString(string.Format("\nPlease enter player {0}'s name.", i + 1), 1, 25);
+            //    int agentSelection = InputInt(string.Format("\nInsert player type:\n0: Human \n1: Stochastic Agent \n2: Hard Coded Agent \n3: RL Agent"), 0, 3);
+            //    players.Add(new Player(name, startMoney, goMoney, goBonus, agentSelection));
+            //}
+            players.Add(new Player(player1, startMoney, goMoney, goBonus, agent1));
+            players.Add(new Player(player2, startMoney, goMoney, goBonus, agent2));
 
             while (players.Count > 1 && !draw)
             {
@@ -140,7 +147,7 @@ namespace Monopoly
                         
                         PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);
                         goes += 1;
-                        if (goes > 2000)
+                        if (goes > 5000)
                         {                           
                             draw = true;
                             break;
@@ -159,10 +166,12 @@ namespace Monopoly
             if (draw)
             {
                 Console.WriteLine("The game has ended in a slatemate");
+                return "draw";
             }
             else
             {
                 Console.WriteLine("{0} wins", players[0].GetName());
+                return players[0].GetName();
             }
         }
 
@@ -287,7 +296,18 @@ namespace Monopoly
 
             if (p.GetProperties().Count > 0)
             {
-                options.Add("Mortgage/Sell Property");
+                bool hasUnMortgage = false;
+                foreach (Property prop in p.GetTradeable())
+                {
+                    if (prop.GetMortgaged() == false)
+                    {
+                        hasUnMortgage = true;
+                    }
+                }
+                if (hasUnMortgage)
+                {
+                    options.Add("Mortgage/Sell Property");
+                }
                 bool hasMortgage = false;
                 foreach (Property prop in p.GetProperties())
                 {
@@ -999,6 +1019,16 @@ namespace Monopoly
             }
         }
 
+        public List<string> GetResults(int noGames, string player1, int agent1, string player2, int agent2) 
+        { 
+            List<string> results = new List<string>();
+            for(int i = 0; i < noGames; i++)
+            {
+                results.Add(Game(player1, agent1, player2, agent2));
+                Thread.Sleep(0);
+            }
+            return results;
+        }
     }
 }
 
