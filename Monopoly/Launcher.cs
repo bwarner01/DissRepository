@@ -16,7 +16,7 @@ namespace Monopoly
         public static void Main(string[] args)
         {
             string filePath = @"E:\DissRepository\DissRepository\Monopoly\bin\results.csv";
-            int noGames = 100;
+            int noGames = 1000;
             string name1 = "bot1";
             string name2 = "bot2";
             int agent1 = 2;
