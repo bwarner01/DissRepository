@@ -22,7 +22,7 @@ namespace Monopoly
         static StatisticalAgent statAg = new StatisticalAgent();
 
 
-        static int startMoney = 1500;
+        static int startMoney = 2500;
         static int goMoney = 200;
         static int goBonus = 100;
         static int bail = 50;

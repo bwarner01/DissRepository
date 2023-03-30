@@ -39,6 +39,20 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "SciSharp.TensorFlow.Redist-Windows-GPU": {
+              "target": "Package",
+              "version": "[2.10.0, )"
+            },
+            "TensorFlow.Keras": {
+              "target": "Package",
+              "version": "[0.10.4, )"
+            },
+            "TensorFlow.NET": {
+              "target": "Package",
+              "version": "[0.100.4, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

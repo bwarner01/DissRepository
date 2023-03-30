@@ -31,7 +31,6 @@ namespace Monopoly
                 {
                     string written = (i + "," + results[i]);
                     file.WriteLine(written);
-                    Console.WriteLine(written);
                 }
             }
             
