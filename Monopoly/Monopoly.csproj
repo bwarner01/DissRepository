@@ -8,9 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SciSharp.TensorFlow.Redist-Windows-GPU" Version="2.10.0" />
-    <PackageReference Include="TensorFlow.Keras" Version="0.10.4" />
-    <PackageReference Include="TensorFlow.NET" Version="0.100.4" />
+    <PackageReference Include="NeuronDotNet" Version="3.0.0" />
+    <PackageReference Include="NeuronDotNet.Core45" Version="3.0.0.1" />
   </ItemGroup>
 
 </Project>

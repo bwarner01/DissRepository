@@ -12,7 +12,4 @@
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <SourceRoot Include="C:\Users\mayan\.nuget\packages\" />
   </ItemGroup>
-  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)scisharp.tensorflow.redist-windows-gpu\2.10.0\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props" Condition="Exists('$(NuGetPackageRoot)scisharp.tensorflow.redist-windows-gpu\2.10.0\build\netstandard2.0\SciSharp.TensorFlow.Redist-Windows-GPU.props')" />
-  </ImportGroup>
 </Project>
