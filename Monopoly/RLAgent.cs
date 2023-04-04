@@ -232,6 +232,25 @@ namespace Monopoly
                 similar = false;
             }
 
+            if (!(state1Vector[10] + 0.075 > state2Vector[10] && state1Vector[10] - 0.075 < state2Vector[10]))
+            {
+                similar = false;
+            }
+
+            if (!similar)
+            {
+                return similar;
+            }
+
+            for (int i = 0; i < 10;  i++)
+            {
+                if (!(state1Vector[i] == state2Vector[i]))
+                {
+                    similar = false;
+                }
+            }
+
+            return similar;
 
         }
     }
