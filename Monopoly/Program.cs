@@ -35,7 +35,7 @@ namespace Monopoly
         static bool freeParkingMoney = false;
         static bool evenBuild = false;
 
-        public string Game(string player1, int agent1, string player2, int agent2)
+        public string Game(string player1, int agent1, string player2, int agent2, RLAgent RLagent)
         {
             players.Clear();
             board.Clear();
@@ -161,15 +161,17 @@ namespace Monopoly
                                         //Complete RL implementation
                                         if(goes - numPlayers <= 0)
                                         {
-                                            //RL First Action
                                             State state = new State(p, board, players);
-                                            string selection;
+                                            string selection = RLagent.FirstAction(state, option);
+                                            choice = option.FindIndex(0, x => x == selection);
                                         }
                                         else
                                         {
-                                            //RL Action Selection
                                             State state = new State(p, board, players);
-                                            string selection;
+                                            //Not correct reward
+                                            double reward = 0;
+                                            string selection = RLagent.SelectAction(state, reward, option);
+                                            choice = option.FindIndex(0, x => x == selection);
                                         }
                                     }
                                     break;
@@ -1079,12 +1081,12 @@ namespace Monopoly
             }
         }
 
-        public List<string> GetResults(int noGames, string player1, int agent1, string player2, int agent2) 
+        public List<string> GetResults(int noGames, string player1, int agent1, string player2, int agent2, RLAgent RLagent) 
         { 
             List<string> results = new List<string>();
             for(int i = 0; i < noGames; i++)
             {
-                results.Add(Game(player1, agent1, player2, agent2));
+                results.Add(Game(player1, agent1, player2, agent2, RLagent));
                 Thread.Sleep(0);
             }
             return results;
