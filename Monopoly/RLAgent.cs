@@ -53,7 +53,7 @@ namespace Monopoly
             epoch = 1;
 
             allActions.Add("Make Trade");
-            allActions.Add("Roll The Dice");
+            //allActions.Add("Roll The Dice");
             allActions.Add("Buy Property");
             allActions.Add("Roll Dice To Get Out Of Jail");
             allActions.Add("Pay To Get Out Of Jail");
@@ -75,7 +75,7 @@ namespace Monopoly
 
             Dictionary<string, double> available = new Dictionary<string, double>();
 
-            foreach(string act in allActions)
+            foreach(string act in options)
             {
                 available.Add(act, 0);
             }
@@ -113,7 +113,7 @@ namespace Monopoly
 
             Dictionary<string, double> available = new Dictionary<string, double>();
 
-            foreach (string act in allActions)
+            foreach (string act in options)
             {
                 available.Add(act, 0);
             }

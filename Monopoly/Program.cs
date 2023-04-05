@@ -143,6 +143,37 @@ namespace Monopoly
                                 Console.WriteLine(choice);
                                 break;
                             }
+                            case Player.Agents.RL:
+                                {
+                                    option.Remove("View Your Property");
+                                    option.Remove("View Position information");
+                                    option.Remove("View Player Data");
+                                    if(option.Count == 2)
+                                    {
+                                        choice = 0;
+                                    }
+                                    else if(option.Exists(x => x == "Roll The Dice"))
+                                    {
+                                        choice = option.FindIndex(0, x => x == "Roll The Dice");
+                                    }
+                                    else
+                                    {
+                                        //Complete RL implementation
+                                        if(goes - numPlayers <= 0)
+                                        {
+                                            //RL First Action
+                                            State state = new State(p, board, players);
+                                            string selection;
+                                        }
+                                        else
+                                        {
+                                            //RL Action Selection
+                                            State state = new State(p, board, players);
+                                            string selection;
+                                        }
+                                    }
+                                    break;
+                                }
                         }
                         
                         PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);
@@ -487,6 +518,12 @@ namespace Monopoly
                             Console.WriteLine(number);
                             break;
                         }
+                    case Player.Agents.RL:
+                        {
+                            number = statAg.SelectSellProperty(properties, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
                 }
                 if (number < properties.Count)
                 {
@@ -538,6 +575,12 @@ namespace Monopoly
                             break;
                         }
                     case Player.Agents.Statistic:
+                        {
+                            number = statAg.SelectUnmortgage(mortgages, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                    case Player.Agents.RL:
                         {
                             number = statAg.SelectUnmortgage(mortgages, p);
                             Console.WriteLine(number);
@@ -598,6 +641,12 @@ namespace Monopoly
                             Console.WriteLine(number);
                             break;
                         }
+                    case Player.Agents.RL:
+                        {
+                            number = statAg.SelectBuildable(buildable, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
                 }
                 if (number < buildable.Count)
                 {
@@ -653,6 +702,12 @@ namespace Monopoly
                             break;
                         }
                     case Player.Agents.Statistic:
+                        {
+                            number = statAg.SelectSellHouse(sellable, p);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                    case Player.Agents.RL:
                         {
                             number = statAg.SelectSellHouse(sellable, p);
                             Console.WriteLine(number);
@@ -979,6 +1034,12 @@ namespace Monopoly
                             break;
                         }
                     case Player.Agents.Statistic:
+                        {
+                            number = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
+                            Console.WriteLine(number);
+                            break;
+                        }
+                    case Player.Agents.RL:
                         {
                             number = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
                             Console.WriteLine(number);
