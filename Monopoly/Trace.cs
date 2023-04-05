@@ -8,11 +8,11 @@ namespace Monopoly
 {
     public class Trace
     {
-        public double[] state { get; set; }
+        public State state { get; set; }
         public string action { get; set; }
-        public float value { get; set; }
+        public double value { get; set; }
 
-        public Trace(double[] state, string action, float value) 
+        public Trace(State state, string action, double value) 
         {
             this.state = state;
             this.action = action;

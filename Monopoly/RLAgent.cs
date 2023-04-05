@@ -65,45 +65,45 @@ namespace Monopoly
             allActions.Add("End Turn");
         }
 
-        public string FirstAction(State state, Dictionary<List<string>,float> actions, List<string> options)
+        public string FirstAction(State state, List<string> options)
         {
             epoch++;
 
             string action = "";
 
-            Dictionary<string, double> QValues = CalculateQValues(state);
+            Dictionary<string, double> QValues = CalculateQVaules(state);
 
             action = EpsilonGreedy(QValues, options);
 
             lastAction = action;
             lastState = state;
 
-            traces.Add(new Trace(state.ToVector(), action, 1));
+            traces.Add(new Trace(state, action, 1));
 
             return action;
         }
 
-        public string SelectAction(State state, double reward, ref Dictionary<string, double> actions, List<string> options)
+        public string SelectAction(State state, double reward, List<string> options)
         {
             epoch++;
 
             string action = "";
 
-            Dictionary<string, double> QValues = CalculateQValues(state);
+            Dictionary<string, double> QValues = CalculateQVaules(state);
 
             action = EpsilonGreedy(QValues, options);
 
             double QValue = 0;
             bool exists = false;
 
-            exists = UpdateQTraces(state, actions, action, reward);
+            exists = UpdateQTraces(state, action, reward);
             QValue = QLearning(lastState, lastAction, state, action, reward);
 
             TrainNueral(lastState, lastAction, QValue);
 
             if (!exists)
             {
-                traces.Add(new Trace(lastState.ToVector(), lastAction, 1));
+                traces.Add(new Trace(lastState, lastAction, 1));
             }
 
             lastAction = action;
@@ -217,6 +217,51 @@ namespace Monopoly
         public bool UpdateQTraces(State state, string action, double reward)
         {
             bool found = false;
+
+            for(int i=0; i< traces.Count; i++)
+            {
+                if (CheckSimilar(state, traces[i].state) && (!action.Equals(traces[i].action)))
+                {
+                    traces[i].value = 0;
+                    traces.RemoveAt(i);
+                    i--;
+                }
+                else if(CheckSimilar(state, traces[i].state) && (action.Equals(traces[i].action)))
+                {
+                    found = true;
+                    traces[i].value = 1;
+
+                    double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
+
+                    string act = FindMaxValues(CalculateQVaules(state));
+                    double maxQT = network.Run(CreateInput(state, act))[0];
+
+                    act = FindMaxValues(CalculateQVaules(lastState));
+                    double maxQ = network.Run(CreateInput(lastState, act))[0];
+
+                    double QVal = QT + alpha * (traces[i].value) * (reward + gamma * maxQT - maxQ);
+
+                    TrainNueral(traces[i].state, traces[i].action, QVal);
+                }
+                else
+                {
+                    traces[i].value = gamma * lamda * traces[i].value;
+
+                    double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
+
+                    string act = FindMaxValues(CalculateQVaules(state));
+                    double maxQT = network.Run(CreateInput(state, act))[0];
+
+                    act = FindMaxValues(CalculateQVaules(lastState));
+                    double maxQ = network.Run(CreateInput(lastState, act))[0];
+
+                    double QVal = QT + alpha * (traces[i].value) * (reward + gamma * maxQT - maxQ);
+
+                    TrainNueral(traces[i].state, traces[i].action, QVal);
+                }
+
+            }
+            return found;
         }
 
         public bool CheckSimilar(State state1, State state2)
