@@ -250,10 +250,8 @@ namespace Monopoly
                 "View Your Property",
                 "View Position information",
                 "View Player Data",
-                "Make Trade"
+                
             };
-
-
 
             if (!p.IsJailed())
             {
@@ -292,6 +290,7 @@ namespace Monopoly
             if (!canRoll && p.GetMoney() >= 0)
             {
                 options.Add("End Turn");
+                options.Add("Make Trade");
             }
 
             if (p.GetProperties().Count > 0)

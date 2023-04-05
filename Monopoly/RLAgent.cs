@@ -13,8 +13,8 @@ namespace Monopoly
     public class RLAgent
     {
 
-        public State lastState { get; set; }
-        public string lastAction { get; set; }
+        public State ?lastState { get; set; }
+        public string ?lastAction { get; set; }
 
         public List<string> allActions = new List<string>();
 
@@ -73,7 +73,27 @@ namespace Monopoly
 
             Dictionary<string, double> QValues = CalculateQVaules(state);
 
-            action = EpsilonGreedy(QValues, options);
+            Dictionary<string, double> available = new Dictionary<string, double>();
+
+            foreach(string act in allActions)
+            {
+                available.Add(act, 0);
+            }
+
+            if (available.Count == 0)
+            {
+                return "Declare Bankrupcy";
+            }
+
+            foreach (string act in available.Keys)
+            {
+                if (QValues.ContainsKey(act))
+                {
+                    available[act] = QValues[act];
+                }
+            }
+
+            action = EpsilonGreedy(available, options);
 
             lastAction = action;
             lastState = state;
@@ -91,7 +111,27 @@ namespace Monopoly
 
             Dictionary<string, double> QValues = CalculateQVaules(state);
 
-            action = EpsilonGreedy(QValues, options);
+            Dictionary<string, double> available = new Dictionary<string, double>();
+
+            foreach (string act in allActions)
+            {
+                available.Add(act, 0);
+            }
+
+            if (available.Count == 0)
+            {
+                return "Declare Bankrupcy";
+            }
+
+            foreach (string act in available.Keys)
+            {
+                if (QValues.ContainsKey(act))
+                {
+                    available[act] = QValues[act];
+                }
+            }
+
+            action = EpsilonGreedy(available, options);
 
             double QValue = 0;
             bool exists = false;
