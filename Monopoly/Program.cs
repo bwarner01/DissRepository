@@ -168,8 +168,7 @@ namespace Monopoly
                                         else
                                         {
                                             State state = new State(p, board, players);
-                                            //Not correct reward
-                                            double reward = 0;
+                                            double reward = CalculateReward(p);
                                             string selection = RLagent.SelectAction(state, reward, option);
                                             choice = option.FindIndex(0, x => x == selection);
                                         }
@@ -1090,6 +1089,80 @@ namespace Monopoly
                 Thread.Sleep(0);
             }
             return results;
+        }
+
+        public double CalculateReward(Player p)
+        {
+            Dictionary<string, int> setValue = new Dictionary<string, int>
+            {
+                { "Brown", 1 },
+                { "Blue", 2 },
+                { "Pink", 3 },
+                { "Orange", 4 },
+                { "Red", 5 },
+                { "Yellow", 6 },
+                { "Green", 7 },
+                { "Purple", 8 }
+            };
+
+            double reward = 0;
+
+            int totalMoney = 0;
+
+            foreach(Player player in players)
+            {
+                List<string> ownedColours = new List<string>();
+                if (player != p)
+                {
+                    foreach(Property prop in player.GetProperties())
+                    {
+                        reward--;
+                        reward -= prop.GetHouses();
+                    }
+
+                    foreach(Property prop in player.GetMonopolies())
+                    {
+                        if(!(ownedColours.FindIndex(0, x => x == prop.GetColour()) == -1))
+                        {
+                            ownedColours.Add(prop.GetColour());
+                        }
+                    }
+                    foreach(string colour in ownedColours)
+                    {
+                        reward -= setValue[colour];
+                    }
+                }
+                else
+                {
+                    foreach (Property prop in player.GetProperties())
+                    {
+                        reward++;
+                        reward += prop.GetHouses();
+                    }
+
+                    foreach (Property prop in player.GetMonopolies())
+                    {
+                        if (!(ownedColours.FindIndex(0, x => x == prop.GetColour()) == -1))
+                        {
+                            ownedColours.Add(prop.GetColour());
+                        }
+                    }
+                    foreach (string colour in ownedColours)
+                    {
+                        reward += setValue[colour];
+                    }
+                }
+
+                totalMoney += player.GetMoney();
+            }
+
+            float moneyF = p.GetMoney() / totalMoney;
+
+            reward = (reward / (players.Count * 5)) / (1 + Math.Abs(reward / (players.Count * 5)));
+
+            reward = reward + (1/players.Count) * moneyF;
+
+            return reward;
         }
     }
 }

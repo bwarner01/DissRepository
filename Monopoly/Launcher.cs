@@ -23,7 +23,7 @@ namespace Monopoly
             int agent2 = 2;
             Program game = new Program();
             //Check value for starting RLAgent
-            RLAgent agent = new RLAgent(0);
+            RLAgent agent = new RLAgent(13);
             List<string> results = game.GetResults(noGames, name1, agent1, name2, agent2, agent);
 
             using (StreamWriter file = new StreamWriter(filePath))
