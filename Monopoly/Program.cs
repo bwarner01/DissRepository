@@ -145,9 +145,15 @@ namespace Monopoly
                             }
                             case Player.Agents.RL:
                                 {
-                                    option.Remove("View Your Property");
-                                    option.Remove("View Position information");
-                                    option.Remove("View Player Data");
+                                    List<string> AIOptions = new List<string>();
+                                    foreach(string o in option)
+                                    {
+                                        AIOptions.Add(o);
+                                    }
+                                    AIOptions.Remove("View Your Property");
+                                    AIOptions.Remove("View Position information");
+                                    AIOptions.Remove("View Player Data");
+                                    AIOptions.Remove("Declare Bankrupcy");
                                     if(option.Count == 2)
                                     {
                                         choice = 0;
@@ -162,30 +168,31 @@ namespace Monopoly
                                         if(goes - numPlayers <= 0)
                                         {
                                             State state = new State(p, board, players);
-                                            string selection = RLagent.FirstAction(state, option);
+                                            string selection = RLagent.FirstAction(state, AIOptions);
                                             choice = option.FindIndex(0, x => x == selection);
                                         }
                                         else
                                         {
                                             State state = new State(p, board, players);
                                             double reward = CalculateReward(p);
-                                            string selection = RLagent.SelectAction(state, reward, option);
+                                            string selection = RLagent.SelectAction(state, reward, AIOptions);
                                             choice = option.FindIndex(0, x => x == selection);
                                         }
                                     }
+                                    Console.WriteLine(choice);
                                     break;
                                 }
                         }
                         
-                        PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);
-                        goes += 1;
-                        if (goes > 5000)
-                        {                           
-                            draw = true;
-                            break;
-                        }
+                        PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);                        
                     }
-                    if(players.Count - eliminated.Count <= 1 || draw)
+                    goes += 1;
+                    if (goes > 2000)
+                    {
+                        draw = true;
+                        break;
+                    }
+                    if (players.Count - eliminated.Count <= 1 || draw)
                     {
                         break;
                     }
@@ -990,8 +997,15 @@ namespace Monopoly
                                 }
                             case Player.Agents.RL:
                                 {
-                                    number = ownedProperty.FindIndex(0, x => x == trade.GetTOut()[0]);
-                                    trade.RemoveTrade(trade.GetTOut()[0]);
+                                    if(trade.GetTOut().Count > 1)
+                                    {
+                                        number = ownedProperty.FindIndex(0, x => x == trade.GetTOut()[0]);
+                                        trade.RemoveTrade(trade.GetTOut()[0]);
+                                    }
+                                    else
+                                    {
+                                        number = trade.GetTOut().Count;
+                                    }
                                     break;
                                 }
                         }

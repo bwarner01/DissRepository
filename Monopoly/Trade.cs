@@ -68,6 +68,7 @@ namespace Monopoly
             string wanted;
             foreach(Property prop in p.GetProperties())
             {
+                if(prop.GetColour() != "NA")
                 setValue[prop.GetColour()]++;
             }
             foreach(KeyValuePair<string, int> pair in setValue)
@@ -100,19 +101,22 @@ namespace Monopoly
             List<Property> unwantedProperty = new List<Property>();
             foreach (Property prop in p.GetProperties())
             {
-                if(!(prop.GetColour() == "Brown" || prop.GetColour() == "Purple") && setValue[prop.GetColour()] != 2 && setValue[prop.GetColour()] != 3)
+                if (prop.GetColour() != "NA")
                 {
-                    unwantedProperty.Add(prop);
-                    int totalValue = 0;
-                    foreach(Property prop2 in unwantedProperty)
+                    if (!(prop.GetColour() == "Brown" || prop.GetColour() == "Purple") && setValue[prop.GetColour()] != 2 && setValue[prop.GetColour()] != 3 && tradeIn != null)
                     {
-                        totalValue += prop2.GetPrice();
+                        unwantedProperty.Add(prop);
+                        int totalValue = 0;
+                        foreach (Property prop2 in unwantedProperty)
+                        {
+                            totalValue += prop2.GetPrice();
+                        }
+                        if (totalValue >= tradeIn.GetPrice())
+                        {
+                            break;
+                        }
                     }
-                    if(totalValue >= tradeIn.GetPrice())
-                    {
-                        break;
-                    }
-                }
+                }               
             }
             return unwantedProperty;
         }
@@ -124,7 +128,12 @@ namespace Monopoly
             {
                 total += prop.GetPrice();
             }
-            return total - tradeIn.GetPrice();
+            if(tradeIn != null)
+            {
+                return total - tradeIn.GetPrice();
+            }
+            else { return total; }
+            
         }
 
         private Property? AssignProp(Player p, List<Property> board, string wanted)
@@ -132,11 +141,14 @@ namespace Monopoly
             Property? desired = null;
             foreach (Property prop in board)
             {
-                if (prop.GetColour() == wanted && !prop.GetOwner().Equals(p) && !prop.GetOwner().Equals(null))
+                if(prop.GetOwner() != null)
                 {
-                    desired = prop;
-                    break;
-                }
+                    if (prop.GetColour() == wanted && !prop.GetOwner().Equals(p))
+                    {
+                        desired = prop;
+                        break;
+                    }
+                }              
             }
             return desired;
         }

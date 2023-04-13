@@ -136,7 +136,7 @@ namespace Monopoly
             double QValue = 0;
             bool exists = false;
 
-            exists = UpdateQTraces(state, action, reward);
+            exists = UpdateQTraces(state, action, reward, options);
             QValue = QLearning(lastState, lastAction, state, action, reward);
 
             TrainNueral(lastState, lastAction, QValue);
@@ -167,9 +167,9 @@ namespace Monopoly
             List<double> input = new List<double>();
 
             input.Add((double)(allActions.FindIndex(0, x => x == action) + 1) / 10);
-            foreach(float val in state.ToVector())
+            foreach(double val in state.ToVector())
             {
-                input.Add(Convert.ToDouble(val));
+                input.Add(val);
             }
 
             return input.ToArray();
@@ -207,7 +207,7 @@ namespace Monopoly
         public string FindMaxValues(Dictionary<string, double> tempQ)
         {
             List<string> maxKeyValues = new List<string>();
-            double maxVal = -1;
+            double maxVal = -99999999;
 
             foreach(KeyValuePair<string, double> kvp in tempQ)
             {
@@ -246,6 +246,7 @@ namespace Monopoly
             foreach (string action in allActions)
             {
                 double[] input = CreateInput(state, action);
+
                 double value = network.Run(input)[0];
 
                 tempQ.Add(action, value);
@@ -254,8 +255,25 @@ namespace Monopoly
             return tempQ;
         }
 
-        public bool UpdateQTraces(State state, string action, double reward)
+        public bool UpdateQTraces(State state, string action, double reward, List<string> options)
         {
+            Dictionary<string, double> QValues = CalculateQVaules(state);
+
+            Dictionary<string, double> available = new Dictionary<string, double>();
+
+            foreach (string act in options)
+            {
+                available.Add(act, 0);
+            }
+
+            foreach (string act in available.Keys)
+            {
+                if (QValues.ContainsKey(act))
+                {
+                    available[act] = QValues[act];
+                }
+            }
+
             bool found = false;
 
             for(int i=0; i< traces.Count; i++)
@@ -273,7 +291,7 @@ namespace Monopoly
 
                     double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
 
-                    string act = FindMaxValues(CalculateQVaules(state));
+                    string act = FindMaxValues(available);
                     double maxQT = network.Run(CreateInput(state, act))[0];
 
                     act = FindMaxValues(CalculateQVaules(lastState));
@@ -289,7 +307,7 @@ namespace Monopoly
 
                     double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
 
-                    string act = FindMaxValues(CalculateQVaules(state));
+                    string act = FindMaxValues(available);
                     double maxQT = network.Run(CreateInput(state, act))[0];
 
                     act = FindMaxValues(CalculateQVaules(lastState));
@@ -356,7 +374,7 @@ namespace Monopoly
         public double[] ToVector()
         {
             double[] propertyValues = new double[10];
-            Dictionary<string, int> owned = new Dictionary<string, int>();
+            Dictionary<string, double> owned = new Dictionary<string, double>();
             foreach(Property prop in p.GetProperties())
             {
                 if (prop.GetColour()=="NA")
@@ -395,7 +413,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Brown"))
             {
-                int houses = CheckHouses(p.GetProperties() ,"Brown");
+                double houses = CheckHouses(p.GetProperties() ,"Brown");
                 propertyValues[0] = ((owned["Brown"] * 6) + houses)/17;
             }
             else
@@ -404,7 +422,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Blue"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Blue");
+                double houses = CheckHouses(p.GetProperties(), "Blue");
                 propertyValues[1] = ((owned["Blue"] * 4) + houses) / 17;
             }
             else
@@ -413,7 +431,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Pink"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Pink");
+                double houses = CheckHouses(p.GetProperties(), "Pink");
                 propertyValues[2] = ((owned["Pink"] * 4) + houses) / 17;
             }
             else
@@ -422,7 +440,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Orange"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Orange");
+                double houses = CheckHouses(p.GetProperties(), "Orange");
                 propertyValues[3] = ((owned["Orange"] * 4) + houses) / 17;
             }
             else
@@ -431,7 +449,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Red"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Red");
+                double houses = CheckHouses(p.GetProperties(), "Red");
                 propertyValues[4] = ((owned["Red"] * 4) + houses) / 17;
             }
             else
@@ -440,7 +458,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Yellow"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Yellow");
+                double houses = CheckHouses(p.GetProperties(), "Yellow");
                 propertyValues[5] = ((owned["Yellow"] * 4) + houses) / 17;
             }
             else
@@ -449,7 +467,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Green"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Green");
+                double houses = CheckHouses(p.GetProperties(), "Green");
                 propertyValues[6] = ((owned["Green"] * 4) + houses) / 17;
             }
             else
@@ -458,7 +476,7 @@ namespace Monopoly
             }
             if (owned.ContainsKey("Purple"))
             {
-                int houses = CheckHouses(p.GetProperties(), "Purple");
+                double houses = CheckHouses(p.GetProperties(), "Purple");
                 propertyValues[7] = ((owned["Purple"] * 6) + houses) / 17;
             }
             else
@@ -482,12 +500,12 @@ namespace Monopoly
                 propertyValues[9] = 0;
             }
 
-            float positionIdnetity = p.GetPosition() / 40;
+            double positionIdnetity = p.GetPosition() / 40;
 
-            float moneyProportion = 0;
-            float propertyProportion = 0;
-            float totalMoney = 0;
-            float totalOwned = 0;
+            double moneyProportion = 0;
+            double propertyProportion = 0;
+            double totalMoney = 0;
+            double totalOwned = 0;
 
             foreach(Property prop in board)
             {
@@ -503,6 +521,10 @@ namespace Monopoly
 
             moneyProportion = p.GetMoney() / totalMoney;
             propertyProportion = totalOwned / p.GetProperties().Count;
+            if (p.GetProperties().Count == 0)
+            {
+                propertyProportion = 0;
+            }
 
             double[] stateVector = new double[13];
             stateVector[0] = propertyValues[0];
