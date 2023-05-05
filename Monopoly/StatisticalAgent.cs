@@ -109,7 +109,7 @@ namespace Monopoly
         {
             foreach(Property prop in buildable)
             {
-                if(prop.GetBuildPrice() + stockpileValue  < p.GetMoney())
+                if(prop.GetBuildPrice()  < p.GetMoney())
                 {
                     return buildable.FindIndex(0, x => x == prop);
 
@@ -120,18 +120,26 @@ namespace Monopoly
 
         public int SelectSellHouse(List<Property> hasHouses, Player p)
         {
-            foreach(Property prop in hasHouses)
+            if(p.GetMoney() < 50)
             {
-                if((prop.GetBuildPrice() / 2) + p.GetMoney() > 0)
+                foreach (Property prop in hasHouses)
                 {
-                    return hasHouses.FindIndex(0, x => x == prop);
+                    if ((prop.GetBuildPrice() / 2) + p.GetMoney() > 0)
+                    {
+                        return hasHouses.FindIndex(0, x => x == prop);
+                    }
                 }
+                return picker.Next(0, hasHouses.Count);
             }
-            return picker.Next(0, hasHouses.Count);
+            return hasHouses.Count;
         }
 
         public int SelectSellProperty(List<Property> sellable, Player p)
         {
+            if (p.GetMoney() > 50)
+            {
+                return sellable.Count;
+            }
             foreach (Property prop in sellable)
             {
                 if ((prop.GetPrice() / 2) + p.GetMoney() > 0)
@@ -140,6 +148,8 @@ namespace Monopoly
                 }
             }
             return picker.Next(0, sellable.Count);
+           
+            
         }
 
         public int SelectUnmortgage(List<Property> mortgages, Player p)

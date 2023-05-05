@@ -22,7 +22,7 @@ namespace Monopoly
         static StatisticalAgent statAg = new StatisticalAgent();
 
 
-        static int startMoney = 2500;
+        static int startMoney = 1500;
         static int goMoney = 200;
         static int goBonus = 100;
         static int bail = 50;
@@ -34,6 +34,7 @@ namespace Monopoly
         static bool doubleRentMonopoly = false;
         static bool freeParkingMoney = false;
         static bool evenBuild = false;
+        private int gamesCompleted;
 
         public string Game(string player1, int agent1, string player2, int agent2, RLAgent RLagent)
         {
@@ -41,7 +42,7 @@ namespace Monopoly
             board.Clear();
             chance.Clear();
             chest.Clear();
-            string path = @"E:\DissRepository\DissRepository\Monopoly\board.csv";
+            string path = @"E:\DissRepository-main\Monopoly\board.csv";
             var parser = new StreamReader(path);
             var headerLine = parser.ReadLine();
             int goes = 0;
@@ -53,7 +54,7 @@ namespace Monopoly
                 board.Add(new Property(row[0], Convert.ToInt32(row[1]), row[2], row[3], Convert.ToInt32(row[4]), Convert.ToInt32(row[5]), Convert.ToInt32(row[6]), Convert.ToInt32(row[7]), Convert.ToInt32(row[8]), Convert.ToInt32(row[9]), Convert.ToInt32(row[10]), Convert.ToInt32(row[11])));
             }
 
-            path = @"E:\DissRepository\DissRepository\Monopoly\chance.csv";
+            path = @"E:\DissRepository-main\Monopoly\chance.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -63,7 +64,7 @@ namespace Monopoly
                 chance.Add(new Card("chance", row[0], Convert.ToInt32(row[1]), row[2]));
             }
 
-            path = @"E:\DissRepository\DissRepository\Monopoly\chest.csv";
+            path = @"E:\DissRepository-main\Monopoly\chest.csv";
             parser = new StreamReader(path);
             headerLine = parser.ReadLine();
             while (!parser.EndOfStream)
@@ -86,10 +87,10 @@ namespace Monopoly
             players.Add(new Player(player2, startMoney, goMoney, goBonus, agent2));
 
             while (players.Count > 1 && !draw)
-            {
+            {               
                 List<Player> eliminated = new List<Player>();
                 foreach(Player p in players)
-                {
+                {                   
                     Console.WriteLine("\n It's {0}'s turn", p.GetName());
                     int diceRoll = 0;
                     bool hasRolled = false;
@@ -97,11 +98,15 @@ namespace Monopoly
                     bool canRoll = true;
                     bool paid = false;
                     bool bankrupt = false;
+                    bool triedSell = false;
+                    bool triedBuild = false;
+                    bool triedTrade = false;
+                    bool triedUnmortgage = false;
                     p.DoubleReset();
                     int choice = 0;
                     while (!turnEnded)
                     {
-
+                        statAg.CalculateStockpile(board);
                         if (board[p.GetPosition()].GetName().Equals("Jail"))
                         {
                             if(!p.IsJailed())
@@ -115,7 +120,7 @@ namespace Monopoly
                         }
                         else
                         {
-                            Console.WriteLine("You are currently at {0} and have {1}", board[p.GetPosition()].GetName(), p.GetMoney());
+                            Console.WriteLine("You are currently at {0} and have {1}. Games completed: {2}", board[p.GetPosition()].GetName(), p.GetMoney(), gamesCompleted);
                         }
                         List<string> option = GenOptions(p, turnEnded, hasRolled, canRoll, paid);
                         Console.WriteLine("You can: \n");
@@ -145,26 +150,47 @@ namespace Monopoly
                             }
                             case Player.Agents.RL:
                                 {
+                                    Trade trade = new Trade(p, board);
                                     List<string> AIOptions = new List<string>();
                                     foreach(string o in option)
                                     {
                                         AIOptions.Add(o);
                                     }
+                                    if (triedSell)
+                                    {
+                                        AIOptions.Remove("Mortgage/Sell Property");
+                                        AIOptions.Remove("Sell Houses");
+                                    }
+                                    if (triedBuild)
+                                    {
+                                        AIOptions.Remove("Build Houses");
+                                    }
+                                    if (triedTrade)
+                                    {
+                                        AIOptions.Remove("Make Trade");
+                                    }
+                                    if (triedUnmortgage)
+                                    {
+                                        AIOptions.Remove("Unmortgage Property");
+                                    }
                                     AIOptions.Remove("View Your Property");
                                     AIOptions.Remove("View Position information");
                                     AIOptions.Remove("View Player Data");
                                     AIOptions.Remove("Declare Bankrupcy");
+                                    if(trade.GetTIn() == null)
+                                    {
+                                        AIOptions.Remove("Make Trade");
+                                    }
                                     if(option.Count == 2)
                                     {
                                         choice = 0;
                                     }
-                                    else if(option.Exists(x => x == "Roll The Dice"))
-                                    {
-                                        choice = option.FindIndex(0, x => x == "Roll The Dice");
-                                    }
+                                    //else if(option.Exists(x => x == "Roll The Dice"))
+                                    //{
+                                    //    choice = option.FindIndex(0, x => x == "Roll The Dice");
+                                    //}
                                     else
                                     {
-                                        //Complete RL implementation
                                         if(goes - numPlayers <= 0)
                                         {
                                             State state = new State(p, board, players);
@@ -184,7 +210,7 @@ namespace Monopoly
                                 }
                         }
                         
-                        PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated);                        
+                        PerformAction(p, option, choice, ref canRoll, ref hasRolled, ref turnEnded, ref paid, ref diceRoll, ref bankrupt, ref eliminated, ref triedSell, ref triedBuild, ref triedTrade, ref triedUnmortgage);                        
                     }
                     goes += 1;
                     if (goes > 2000)
@@ -204,12 +230,23 @@ namespace Monopoly
             }
             if (draw)
             {
+                gamesCompleted++;
                 Console.WriteLine("The game has ended in a slatemate");
+                RLagent.AgentEnd(-10);
                 return "draw";
             }
             else
             {
+                gamesCompleted++;
                 Console.WriteLine("{0} wins", players[0].GetName());
+                if (players[0].GetAgent() == Player.Agents.RL)
+                {
+                    RLagent.AgentEnd(10);
+                }
+                else
+                {
+                    RLagent.AgentEnd(-10);
+                }
                 return players[0].GetName();
             }
         }
@@ -287,7 +324,7 @@ namespace Monopoly
             List<string> options = new List<string>
             {
                 "View Your Property",
-                "View Position information",
+                "View Position Information",
                 "View Player Data",
                 
             };
@@ -362,19 +399,19 @@ namespace Monopoly
 
             if (p.CanBuild())
             {
-                options.Add("Build Houses");
-                bool hasHouses = false;
-                foreach (Property prop in p.GetProperties())
+                options.Add("Build Houses");              
+            }
+            bool hasHouses = false;
+            foreach (Property prop in p.GetProperties())
+            {
+                if (prop.GetHouses() > 0)
                 {
-                    if (prop.GetHouses() > 0)
-                    {
-                        hasHouses = true;
-                    }
+                    hasHouses = true;
                 }
-                if (hasHouses)
-                {
-                    options.Add("Sell Houses");
-                }
+            }
+            if (hasHouses)
+            {
+                options.Add("Sell Houses");
             }
 
             if (board[p.GetPosition()].GetOwned() && !board[p.GetPosition()].GetMortgaged() && board[p.GetPosition()].GetOwner() != p && hasRolled == true && paid == false)
@@ -419,7 +456,7 @@ namespace Monopoly
             return options;
         }
 
-        private static void PerformAction(Player p, List<string> options, int choice, ref bool canRoll, ref bool hasRolled, ref bool turnEnded, ref bool paid, ref int diceRoll, ref bool bankrupt, ref List<Player> eliminated)
+        private static void PerformAction(Player p, List<string> options, int choice, ref bool canRoll, ref bool hasRolled, ref bool turnEnded, ref bool paid, ref int diceRoll, ref bool bankrupt, ref List<Player> eliminated, ref bool triedSell, ref bool triedBuild, ref bool triedTrade, ref bool triedUnmortgage)
         {
             string action = options[choice];
 
@@ -488,6 +525,10 @@ namespace Monopoly
                     canRoll = false;
                     p.GoToJail();
                 }
+                triedBuild = false;
+                triedSell = false;
+                triedTrade = false;
+                triedUnmortgage = false;
 
             }
             if(action== "Buy Property")
@@ -550,6 +591,7 @@ namespace Monopoly
                 else
                 {
                     Console.WriteLine("Cancelled");
+                    triedSell = true;
                 }
             }
             if(action== "Unmortgage Property")
@@ -610,6 +652,7 @@ namespace Monopoly
                 else
                 {
                     Console.WriteLine("Cancelled");
+                    triedUnmortgage = true;
                 }
             }
             if(action== "Build Houses")
@@ -678,6 +721,7 @@ namespace Monopoly
                 else
                 {
                     Console.WriteLine("Cancelled");
+                    triedBuild = true;
                 }
             }
             if(action== "Sell Houses")
@@ -729,6 +773,7 @@ namespace Monopoly
                 else
                 {
                     Console.WriteLine("Cancelled");
+                    triedSell = true;
                 }
             }
             if(action== "Roll Dice To Get Out Of Jail")
@@ -898,6 +943,7 @@ namespace Monopoly
                 if(number == otherPlayers.Count)
                 {
                     Console.WriteLine("Trade Cancelled");
+                    triedTrade = true;
                     cancelled = true;
                 }
                 if (!cancelled)
@@ -932,6 +978,7 @@ namespace Monopoly
                             case Player.Agents.RL:
                                 {
                                     number = wantedProperty.FindIndex(0, x => x == trade.GetTIn());
+                                    Console.WriteLine(number);
                                     break;
                                 }
                         }
@@ -997,14 +1044,15 @@ namespace Monopoly
                                 }
                             case Player.Agents.RL:
                                 {
-                                    if(trade.GetTOut().Count > 1)
+                                    if(trade.GetTOut().Count > 0)
                                     {
                                         number = ownedProperty.FindIndex(0, x => x == trade.GetTOut()[0]);
+                                        Console.WriteLine(trade.GetTOut()[0].GetName());
                                         trade.RemoveTrade(trade.GetTOut()[0]);
                                     }
                                     else
                                     {
-                                        number = trade.GetTOut().Count;
+                                        number = ownedProperty.Count;
                                     }
                                     break;
                                 }
@@ -1071,6 +1119,7 @@ namespace Monopoly
                         case Player.Agents.RL:
                             {
                                 moneyIn = trade.GetMIn();
+                                Console.WriteLine(moneyIn);
                                 break;
                             }
                     }
@@ -1089,7 +1138,15 @@ namespace Monopoly
                             }
                         case Player.Agents.RL:
                             {
-                                moneyIn = trade.GetMOut();
+                                if (p.GetMoney() > trade.GetMOut())
+                                {
+                                    moneyOut = trade.GetMOut();
+                                }
+                                else
+                                {
+                                    moneyOut = 0;
+                                }
+                                Console.WriteLine(moneyOut);
                                 break;
                             }
                     }
@@ -1111,14 +1168,14 @@ namespace Monopoly
                             }
                         case Player.Agents.Statistic:
                             {
-                                number = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
-                                Console.WriteLine(number);
+                                agree = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
+                                Console.WriteLine(agree);
                                 break;
                             }
                         case Player.Agents.RL:
                             {
-                                number = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
-                                Console.WriteLine(number);
+                                agree = statAg.AssessTrade(tradeOut, tradeIn, moneyOut, moneyIn);
+                                Console.WriteLine(agree);
                                 break;
                             }
                     }
@@ -1150,6 +1207,7 @@ namespace Monopoly
                     else
                     {
                         Console.WriteLine("Trade Cancelled");
+                        triedTrade = true;
                     }
                 }
                 
@@ -1184,12 +1242,12 @@ namespace Monopoly
 
             double reward = 0;
 
-            int totalMoney = 0;
+            double totalMoney = 0;
 
             foreach(Player player in players)
             {
                 List<string> ownedColours = new List<string>();
-                if (player != p)
+                if (!player.Equals(p))
                 {
                     foreach(Property prop in player.GetProperties())
                     {
@@ -1233,7 +1291,15 @@ namespace Monopoly
                 totalMoney += player.GetMoney();
             }
 
-            float moneyF = p.GetMoney() / totalMoney;
+            double moneyF;
+            if (totalMoney != 0) 
+            {
+                moneyF = p.GetMoney() / totalMoney;
+            }
+            else
+            {
+                moneyF = 1/players.Count;
+            }
 
             reward = (reward / (players.Count * 5)) / (1 + Math.Abs(reward / (players.Count * 5)));
 

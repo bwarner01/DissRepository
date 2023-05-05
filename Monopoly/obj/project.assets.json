@@ -54,11 +54,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
+      "projectUniqueName": "E:\\DissRepository-main\\Monopoly\\Monopoly.csproj",
       "projectName": "Monopoly",
-      "projectPath": "E:\\DissRepository\\DissRepository\\Monopoly\\Monopoly.csproj",
+      "projectPath": "E:\\DissRepository-main\\Monopoly\\Monopoly.csproj",
       "packagesPath": "C:\\Users\\mayan\\.nuget\\packages\\",
-      "outputPath": "E:\\DissRepository\\DissRepository\\Monopoly\\obj\\",
+      "outputPath": "E:\\DissRepository-main\\Monopoly\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mayan\\AppData\\Roaming\\NuGet\\NuGet.Config",

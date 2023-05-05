@@ -152,15 +152,21 @@ namespace Monopoly
 
         public int UtilityRent(int roll)
         {
-            Player boss = owner;
-            int amount = boss.GetUtilities().Count;
-            if (amount == 1)
+            if(owner != null)
             {
-                return roll * 4;
-            }
-            else if (amount == 2)
-            {
-                return roll * 10;
+                int amount = owner.GetUtilities().Count;
+                if (amount == 1)
+                {
+                    return roll * 4;
+                }
+                else if (amount == 2)
+                {
+                    return roll * 10;
+                }
+                else
+                {
+                    return 0;
+                }
             }
             else
             {
@@ -170,23 +176,30 @@ namespace Monopoly
 
         public int TrainRent()
         {
-            int amount = owner.GetTrains().Count;
-            if (amount == 1)
+            if(owner != null)
             {
-                return 25;
-            }
-            if (amount == 2)
-            {
-                return 50;
-            }
-            if (amount == 3)
-            {
-                return 100;
-            }
-            if (amount == 4)
-            {
-                return 200;
-            }
+                int amount = owner.GetTrains().Count;
+                if (amount == 1)
+                {
+                    return 25;
+                }
+                if (amount == 2)
+                {
+                    return 50;
+                }
+                if (amount == 3)
+                {
+                    return 100;
+                }
+                if (amount == 4)
+                {
+                    return 200;
+                }
+                else
+                {
+                    return 0;
+                }
+            }            
             else
             {
                 return 0;

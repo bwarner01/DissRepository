@@ -15,11 +15,11 @@ namespace Monopoly
     {        
         public static void Main(string[] args)
         {
-            string filePath = @"E:\DissRepository\DissRepository\Monopoly\bin\results.csv";
-            int noGames = 1000;
-            string name1 = "RLbot";
-            string name2 = "bot2";
-            int agent1 = 3;
+            string filePath = @"E:\DissRepository-main\Monopoly\bin\Test.csv";
+            int noGames = 1;
+            string name1 = "Human Player";
+            string name2 = "Standardbot";
+            int agent1 = 0;
             int agent2 = 2;
             Program game = new Program();
             //Check value for starting RLAgent

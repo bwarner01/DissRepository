@@ -41,11 +41,11 @@ namespace Monopoly
 
             this.network = new BackpropagationNetwork(inputLayer, outputLayer);
 
-            this.network.SetLearningRate(0.2);
+            this.network.SetLearningRate(0.3);
             this.network.Initialize();
 
 
-            this.epsilon = 0.5;
+            this.epsilon = 0.55;
             this.alpha = 0.2;
             this.gamma = 0.95;
             this.lamda = 0.8;
@@ -53,7 +53,7 @@ namespace Monopoly
             epoch = 1;
 
             allActions.Add("Make Trade");
-            //allActions.Add("Roll The Dice");
+            allActions.Add("Roll The Dice");
             allActions.Add("Buy Property");
             allActions.Add("Roll Dice To Get Out Of Jail");
             allActions.Add("Pay To Get Out Of Jail");
@@ -136,7 +136,7 @@ namespace Monopoly
             double QValue = 0;
             bool exists = false;
 
-            exists = UpdateQTraces(state, action, reward, options);
+            exists = UpdateQTraces(state, action, reward);
             QValue = QLearning(lastState, lastAction, state, action, reward);
 
             TrainNueral(lastState, lastAction, QValue);
@@ -166,7 +166,7 @@ namespace Monopoly
         {
             List<double> input = new List<double>();
 
-            input.Add((double)(allActions.FindIndex(0, x => x == action) + 1) / 10);
+            input.Add((double)(allActions.FindIndex(0, x => x == action) + 1) / 11);
             foreach(double val in state.ToVector())
             {
                 input.Add(val);
@@ -248,31 +248,15 @@ namespace Monopoly
                 double[] input = CreateInput(state, action);
 
                 double value = network.Run(input)[0];
-
                 tempQ.Add(action, value);
             }
 
             return tempQ;
         }
 
-        public bool UpdateQTraces(State state, string action, double reward, List<string> options)
+        public bool UpdateQTraces(State state, string action, double reward)
         {
             Dictionary<string, double> QValues = CalculateQVaules(state);
-
-            Dictionary<string, double> available = new Dictionary<string, double>();
-
-            foreach (string act in options)
-            {
-                available.Add(act, 0);
-            }
-
-            foreach (string act in available.Keys)
-            {
-                if (QValues.ContainsKey(act))
-                {
-                    available[act] = QValues[act];
-                }
-            }
 
             bool found = false;
 
@@ -291,7 +275,7 @@ namespace Monopoly
 
                     double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
 
-                    string act = FindMaxValues(available);
+                    string act = FindMaxValues(QValues);
                     double maxQT = network.Run(CreateInput(state, act))[0];
 
                     act = FindMaxValues(CalculateQVaules(lastState));
@@ -307,7 +291,7 @@ namespace Monopoly
 
                     double QT = network.Run(CreateInput(traces[i].state, traces[i].action))[0];
 
-                    string act = FindMaxValues(available);
+                    string act = FindMaxValues(QValues);
                     double maxQT = network.Run(CreateInput(state, act))[0];
 
                     act = FindMaxValues(CalculateQVaules(lastState));
@@ -352,9 +336,15 @@ namespace Monopoly
                     similar = false;
                 }
             }
-
             return similar;
 
+        }
+
+        public void AgentEnd(double reward)
+        {
+            UpdateQTraces(lastState, lastAction, reward);
+            epsilon *= 0.99;
+            alpha *= 0.99;
         }
     }
 
